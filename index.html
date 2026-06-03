@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK BN(O) Visa Tracker & Compliance Suite 英國國民（海外）簽證居留追蹤工具</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --absent-day: #fee2e2;
+            --absent-text: #991b1b;
+            --today-border: #2563eb;
+            --today-bg: #eff6ff;
+            --ilr-milestone: #dbeafe;
+            --ilr-text: #1e40af;
+            --citizen-milestone: #f3e8ff;
+            --citizen-text: #6b21a8;
+        }
+
+        body {
+            font-family: "Noto Sans HK", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--primary); margin-bottom: 5px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 992px) { .grid { grid-template-columns: 320px 1fr; } }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h2 { font-size: 1.25rem; margin-top: 0; color: var(--primary); border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;}
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+        button:hover { background-color: #1d4ed8; }
+
+        .clear-btn { background-color: #64748b; margin-top: 5px; }
+        .clear-btn:hover { background-color: #475569; }
+        .today-btn { background-color: #0284c7; margin-top: 0; width: auto; padding: 8px 15px; font-size: 0.9rem;}
+        .today-btn:hover { background-color: #0369a1; }
+        .export-btn { background-color: #0f766e; }
+        .export-btn:hover { background-color: #115e59; }
+        .import-btn { background-color: #7c3aed; }
+        .import-btn:hover { background-color: #6d28d9; }
+        textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+        }
+
+        /* --- GRANULAR CUSHION MONITOR ENGINE --- */
+        .cushion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .cushion-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .cushion-card.overall {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        .cushion-title { font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+        .cushion-card.overall .cushion-title { color: #166534; }
+        .cushion-value { font-size: 1.6rem; font-weight: 800; margin: 5px 0; color: #1e293b; }
+        .cushion-meta { font-size: 0.75rem; color: #64748b; }
+
+        /* --- APPLICATION TIMELINE DATES --- */
+        .dates-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .date-card {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .date-card.ilr { background: #eff6ff; border-color: #bfdbfe; }
+        .date-card.citizenship { background: #fdf4ff; border-color: #f5d0fe; }
+
+        .date-card .title { font-size: 0.85rem; font-weight: bold; color: #b45309; text-transform: uppercase; }
+        .date-card.ilr .title { color: #1d4ed8; }
+        .date-card.citizenship .title { color: #86198f; }
+
+        .date-card .target-date { font-size: 1.35rem; font-weight: 800; margin: 8px 0; color: #1e293b; }
+        .date-card .countdown { font-size: 0.85rem; font-weight: 600; color: #475569; }
+
+        /* --- YEAR TIMELINE MATRIX --- */
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .year-card {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border-top: 4px solid #cbd5e1;
+        }
+        .year-card.safe { border-top-color: var(--success); }
+        .year-card.warning { border-top-color: var(--warning); }
+        .year-card.danger { border-top-color: var(--danger); }
+        .year-card.disqualified { opacity: 0.72; background: #f8fafc; border-top-color: #64748b; }
+        .year-card.renewed { box-shadow: 0 0 0 2px #1e3a8a inset; }
+        .renewal-marker { grid-column: 1 / -1; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; padding:12px 14px; border-radius:8px; font-weight:700; text-align:center; }
+        .year-days { font-size: 1.4rem; font-weight: bold; margin: 5px 0; }
+        .year-label { font-size: 0.85rem; font-weight: 600; }
+        .year-dates { font-size: 0.7rem; color: #64748b; }
+
+        .trip-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+        .trip-table th, .trip-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .trip-table th { background-color: #f8fafc; color: #64748b; }
+
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; }
+        .badge.safe { background-color: var(--success); }
+        .badge.warning { background-color: var(--warning); }
+        .badge.danger { background-color: var(--danger); }
+
+        .delete-btn { background: none; color: var(--danger); border: none; cursor: pointer; padding: 0; font-size: 0.9rem; text-decoration: underline; width: auto; }
+        .note { font-size: 0.8rem; color: #64748b; margin-top: 5px; font-style: italic; }
+        .highlight-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 0.85rem; color: #92400e; }
+
+        .rule-note {
+            margin-top: 8px;
+            font-size: 0.78rem;
+            line-height: 1.45;
+            color: #64748b;
+        }
+        .rule-note strong { color: #334155; }
+
+        .config-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        .file-input {
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+
+        /* --- CALENDAR COMPONENTS --- */
+        .cal-header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .cal-nav-btn {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background-color: #e2e8f0;
+            color: var(--text);
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+        }
+        .cal-nav-btn:hover { background-color: #cbd5e1; }
+
+        .cal-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            flex-grow: 1;
+        }
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+        .cal-day-label {
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: #64748b;
+            padding: 5px 0;
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .cal-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: #fff;
+            position: relative;
+            cursor: help;
+        }
+        .cal-cell.empty { background: #f8fafc; border: none; cursor: default; }
+        .cal-cell.absent {
+            background-color: var(--absent-day);
+            color: var(--absent-text);
+            border-color: #fca5a5;
+            font-weight: bold;
+        }
+        .cal-cell.travel-day {
+            background-color: #fef08a;
+            color: #854d0e;
+            border-color: #fde047;
+            font-size: 0.85rem;
+        }
+
+        /* APPLICATION DATE MILESTONE STYLING */
+        .cal-cell.ilr-milestone-day {
+            background-color: var(--ilr-milestone) !important;
+            color: var(--ilr-text) !important;
+            border: 2px solid #3b82f6 !important;
+            font-weight: 800;
+        }
+        .cal-cell.ilr-milestone-day::after {
+            content: var(--label-ilr-appl, "ILR APPL");
+            position: absolute;
+            bottom: 2px;
+            font-size: 0.5rem;
+            color: var(--ilr-text);
+            font-weight: 800;
+        }
+
+        .cal-cell.citizen-milestone-day {
+            background-color: var(--citizen-milestone) !important;
+            color: var(--citizen-text) !important;
+            border: 2px solid #a855f7 !important;
+            font-weight: 800;
+        }
+        .cal-cell.citizen-milestone-day::after {
+            content: var(--label-passport, "PASSPORT");
+            position: absolute;
+            bottom: 2px;
+            font-size: 0.5rem;
+            color: var(--citizen-text);
+            font-weight: 800;
+        }
+
+        .cal-cell.today {
+            outline: 3px solid var(--today-border);
+            outline-offset: -3px;
+            background-color: var(--today-bg);
+            font-weight: bold;
+        }
+        .cal-cell.today::after {
+            content: var(--label-today, "TODAY");
+            position: absolute;
+            bottom: 2px;
+            font-size: 0.55rem;
+            color: var(--today-border);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- CALENDAR RICH HOVER TOOLTIP --- */
+        .cal-cell .tooltip {
+            display: none;
+            position: absolute;
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            width: 420px;
+            z-index: 50;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
+            text-align: left;
+            pointer-events: none;
+            border: 1px solid #334155;
+        }
+        .cal-cell .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: #0f172a transparent transparent transparent;
+        }
+        .cal-cell:hover .tooltip { display: block; }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-color { width: 15px; height: 15px; border-radius: 4px; border: 1px solid #cbd5e1; }
+
+        /* --- MOBILE WIDTH CONSISTENCY FIX --- */
+        html {
+            box-sizing: border-box;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+
+        .container,
+        .container > header,
+        .container > div[style*="max-width: 1200px"] {
+            width: 100%;
+        }
+
+        .container > div[style*="max-width: 1200px"] {
+            max-width: none !important;
+        }
+
+        .sidebar,
+        .main-content,
+        .card,
+        .dates-box,
+        .cushion-grid,
+        .timeline,
+        .cal-grid {
+            min-width: 0;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 10px;
+                overflow-x: hidden;
+            }
+
+            .container {
+                max-width: none;
+                width: 100%;
+            }
+
+            header {
+                margin-bottom: 16px;
+                padding: 0;
+            }
+
+            h1 {
+                font-size: 1.45rem;
+                line-height: 1.25;
+                overflow-wrap: anywhere;
+            }
+
+            header p {
+                margin-left: auto;
+                margin-right: auto;
+                max-width: 100%;
+                overflow-wrap: anywhere;
+            }
+
+            .container > div[style*="max-width: 1200px"] {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                margin-bottom: 14px !important;
+            }
+
+            .container > div[style*="max-width: 1200px"] > div {
+                width: 100%;
+                padding: 12px !important;
+                font-size: 0.82rem !important;
+                line-height: 1.5 !important;
+            }
+
+            .grid {
+                gap: 14px;
+            }
+
+            .card {
+                width: 100%;
+                padding: 14px;
+                margin-bottom: 14px;
+                border-radius: 10px;
+            }
+
+            h2 {
+                font-size: 1.05rem;
+                line-height: 1.3;
+                overflow-wrap: anywhere;
+            }
+
+            .dates-box,
+            .cushion-grid,
+            .timeline {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 10px;
+            }
+
+            .date-card .target-date {
+                font-size: 1.1rem;
+            }
+
+            .cushion-value {
+                font-size: 1.35rem;
+            }
+
+            input,
+            select,
+            button,
+            textarea {
+                font-size: 16px;
+                max-width: 100%;
+            }
+
+            .today-btn {
+                width: 100%;
+                margin-top: 8px;
+            }
+
+            .card > div[style*="display: flex"][style*="justify-content: space-between"] {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 8px;
+            }
+
+            .cal-header-container {
+                display: grid;
+                grid-template-columns: 44px minmax(0, 1fr) 44px;
+                gap: 6px;
+                align-items: stretch;
+            }
+
+            .cal-controls {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 6px;
+            }
+
+            .cal-nav-btn {
+                width: 44px;
+                height: auto;
+                min-height: 44px;
+            }
+
+            .cal-grid {
+                gap: 2px;
+            }
+
+            .cal-day-label {
+                font-size: 0.65rem;
+                padding: 4px 0;
+            }
+
+            .cal-cell {
+                min-height: 38px;
+                aspect-ratio: auto;
+                font-size: 0.72rem;
+                border-radius: 4px;
+            }
+
+            .cal-cell.today::after,
+            .cal-cell.ilr-milestone-day::after,
+            .cal-cell.citizen-milestone-day::after {
+                font-size: 0.38rem;
+                bottom: 1px;
+            }
+
+            .cal-cell .tooltip {
+                width: min(260px, calc(100vw - 28px));
+                max-width: calc(100vw - 28px);
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 0.68rem;
+                white-space: normal !important;
+            }
+
+            .legend {
+                justify-content: flex-start;
+                gap: 8px 10px;
+                font-size: 0.72rem;
+            }
+
+            .trip-table {
+                font-size: 0.72rem;
+                min-width: 520px;
+            }
+
+            .trip-table th,
+            .trip-table td {
+                padding: 6px;
+            }
+        }
+
+
+        /* --- SMART TOOLTIP EDGE HANDLING --- */
+        .cal-cell .tooltip {
+            max-width: min(420px, calc(100vw - 24px));
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .cal-cell:first-child .tooltip,
+        .cal-cell:nth-child(7n+1) .tooltip {
+            left: 0;
+            transform: none;
+        }
+
+        .cal-cell:first-child .tooltip::after,
+        .cal-cell:nth-child(7n+1) .tooltip::after {
+            left: 18px;
+            transform: none;
+        }
+
+        .cal-cell:last-child .tooltip,
+        .cal-cell:nth-child(7n) .tooltip {
+            left: auto;
+            right: 0;
+            transform: none;
+        }
+
+        .cal-cell:last-child .tooltip::after,
+        .cal-cell:nth-child(7n) .tooltip::after {
+            left: auto;
+            right: 18px;
+            transform: none;
+        }
+
+        .site-footer {
+            text-align: center;
+            margin: 28px 0 8px;
+            color: var(--primary);
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .site-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .site-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .cal-cell .tooltip {
+                position: fixed;
+                left: 50% !important;
+                right: auto !important;
+                top: auto;
+                bottom: 12px;
+                transform: translateX(-50%) !important;
+                width: min(300px, calc(100vw - 20px));
+                max-width: calc(100vw - 20px);
+                z-index: 9999;
+                pointer-events: none;
+            }
+
+            .cal-cell .tooltip::after {
+                display: none;
+            }
+
+            .cal-grid {
+                overflow: visible;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1 data-i18n="appTitle">UK BN(O) Visa Tracker & Compliance Suite</h1>
+        <p data-i18n="appSubtitle">Comprehensive monitoring for 5-Year ILR and 6-Year Citizenship pathways.</p>
+    </header>
+
+    <div style="max-width: 1200px; margin: 0 auto 20px auto;">
+        <div style="background:#fff7ed; border:1px solid #fdba74; color:#9a3412; padding:14px 16px; border-radius:10px; font-size:0.9rem; line-height:1.6;">
+            <strong>Important: </strong>
+            This tool is provided for general reference only and may not be fully accurate.
+            Always verify information with the official UK government website and seek advice from a qualified immigration lawyer or professional adviser where necessary.
+            <br>
+            <strong>重要聲明：</strong>
+            本工具只供一般參考用途，內容未必完全準確，亦不構成任何法律或移民建議。
+            使用前請自行核實所有資料，並以英國政府官方網站最新公布的規定為準。
+            如有需要，請向合資格移民律師或專業顧問查詢。
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="sidebar">
+            <div class="card">
+                <h2 data-i18n="setupTitle">1. Setup Timeline Dates</h2>
+                <div class="form-group">
+                    <label for="visaStart" data-i18n="visaGrantDate">Visa Grant Date</label>
+                    <input type="date" id="visaStart" value="2021-06-01" onchange="saveTimelineSettings()">
+                </div>
+                <div class="form-group">
+                    <label for="entryDate" data-i18n="physicalEntryDate">Physical Date Entered UK</label>
+                    <input type="date" id="entryDate" value="2021-06-15" onchange="saveTimelineSettings()">
+                </div>
+                <div class="form-group">
+                    <label for="ilrGrantDate" data-i18n="ilrGrantDate">ILR Granted Date (optional)</label>
+                    <input type="date" id="ilrGrantDate" onchange="saveTimelineSettings()">
+                    <div class="note" data-i18n="ilrGrantDateNote">Only enter this once ILR has actually been granted. Citizenship will use this date if available.</div>
+                </div>
+                <div id="delayWarning" class="highlight-box" style="display:none;"></div>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="languageTitle">Language</h2>
+                <div class="form-group">
+                    <label for="languageSelect" data-i18n="languageLabel">Display Language</label>
+                    <select id="languageSelect" onchange="setLanguage(this.value)">
+                        <option value="en">English</option>
+                        <option value="zh-HK">中文</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="travelTitle">2. Log Additional Travel</h2>
+                <form id="tripForm" onsubmit="addTrip(event)">
+                    <div class="form-group">
+                        <label for="destination" data-i18n="destination">Destination</label>
+                        <input type="text" id="destination" placeholder="e.g., Summer Holiday" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateOut" data-i18n="dateLeftUK">Date Left UK</label>
+                        <input type="date" id="dateOut" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateIn" data-i18n="dateReturnedUK">Date Returned to UK</label>
+                        <input type="date" id="dateIn" required>
+                    </div>
+                    <button type="submit" data-i18n="logTrip">Log Trip</button>
+                </form>
+                <button onclick="clearAllData()" class="clear-btn" data-i18n="resetClear">Reset & Clear All Data</button>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="backupTitle">3. Backup / Restore</h2>
+                <p class="note" style="margin-bottom: 10px;" data-i18n="backupNote">Export your tracker setup and trips as a JSON backup file, or import a previously exported backup.</p>
+                <button type="button" onclick="downloadConfigJson()" class="export-btn" data-i18n="downloadBackup">Download JSON Backup</button>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="configFileInput" data-i18n="importFromFile">Import From File</label>
+                    <input type="file" id="configFileInput" accept="application/json,.json" onchange="importConfigFromFile(event)">
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+
+            <div class="dates-box">
+                <div class="date-card ilr">
+                    <div class="title" data-i18n="earliestIlrApplicationDate">🎉 Earliest ILR Application Date</div>
+                    <div class="target-date" id="ilrTargetDate">-- ---- ----</div>
+                    <div class="countdown" id="ilrCountdown">--</div>
+                    <div class="note" id="ilrDateMeta" style="margin-top: 5px; font-size:0.75rem;">--</div>
+                    <div class="rule-note" data-i18n-html="ilrRuleUsed"><strong>Rule used:</strong> calculated from your physical UK entry date + 5 years, then minus 28 days for the earliest application window.</div>
+                </div>
+                <div class="date-card citizenship">
+                    <div class="title" data-i18n="earliestCitizenshipApplicationDate">🇬🇧 Earliest Citizenship Application Date</div>
+                    <div class="target-date" id="citizenTargetDate">-- ---- ----</div>
+                    <div class="countdown" id="citizenCountdown">--</div>
+                    <div class="note" id="citizenDateMeta" style="margin-top: 5px; font-size:0.75rem;">--</div>
+                    <div class="rule-note" data-i18n-html="citizenshipRuleUsed"><strong>Rule used:</strong> approximated as 1 year after the earliest ILR application date. Actual eligibility depends on the real ILR grant date and citizenship rules at the time.</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="cushionTitle">Safety Cushion Breakdown</h2>
+                <div class="cushion-grid">
+                    <div class="cushion-card overall">
+                        <div>
+                            <div class="cushion-title" data-i18n="totalSafeCushion">🛡️ Total Safe Cushion</div>
+                            <div class="cushion-value" id="cushionOverall">0 Days</div>
+                        </div>
+                        <div class="cushion-meta" data-i18n="limitingBottleneck">Your limiting critical bottleneck factor.</div>
+                        <div class="rule-note" data-i18n-html="overallCushionRule"><strong>How calculated:</strong> the lowest active remaining allowance across the applicable ILR and citizenship absence rules.</div>
+                    </div>
+                    <div class="cushion-card">
+                        <div>
+                            <div class="cushion-title" data-i18n="ilrRollingRule">⏳ ILR Rolling 12-Month Rule</div>
+                            <div class="cushion-value" id="cushionRolling">0 Days</div>
+                        </div>
+                        <div class="cushion-meta" data-i18n="cushionVs180">Cushion vs 180-day limit.</div>
+                        <div class="rule-note" data-i18n-html="rollingCushionRule"><strong>How calculated:</strong> 180 minus the highest absence count found in any rolling 365-day window during the ILR qualifying period.</div>
+                    </div>
+                    <div class="cushion-card">
+                        <div>
+                            <div class="cushion-title" data-i18n="citizenship5YearAccumulation">🌍 Citizenship 5-Yr Accumulation</div>
+                            <div class="cushion-value" id="cushionCitizenTotal">0 Days</div>
+                        </div>
+                        <div class="cushion-meta" data-i18n="cushionVs450">Cushion vs 450-day Y2-Y6 limit.</div>
+                        <div class="rule-note" data-i18n-html="citizenTotalRule"><strong>How calculated:</strong> 450 minus total counted absent days across the citizenship qualifying period used here, Years 2–6.</div>
+                    </div>
+                    <div class="cushion-card">
+                        <div>
+                            <div class="cushion-title" data-i18n="citizenshipFinalYear">📅 Citizenship Final Year</div>
+                            <div class="cushion-value" id="cushionCitizenY6">0 Days</div>
+                        </div>
+                        <div class="cushion-meta" data-i18n="cushionVs90">Cushion vs 90-day Y6 limit.</div>
+                        <div class="rule-note" data-i18n-html="citizenY6Rule"><strong>How calculated:</strong> inactive until Year 6 starts; then 90 minus counted absent days in the final qualifying year.</div>
+                    </div>
+                </div>
+                <div id="citizenshipStatusText" style="font-weight: 700; text-align: center; padding: 10px; border-radius: 8px; font-size: 1rem;"></div>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="absenceVisualizerTitle">6-Year Absence Visualizer</h2>
+                <p class="note" style="margin-bottom: 15px;" data-i18n="absenceVisualizerNote">Yearly blocks are derived starting from your official Visa Grant date. Years 1–5 monitor the 180-day rolling window.</p>
+                <div class="timeline" id="timelineContainer"></div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px;">
+                    <h2 style="border: none; margin: 0; padding: 0;" data-i18n="calendarTitle">Interactive Travel Calendar</h2>
+                    <button class="today-btn" onclick="jumpToToday()" data-i18n="jumpToday">📅 Jump to Today</button>
+                </div>
+                <p class="note" style="margin-bottom: 15px;" data-i18n="calendarHoverNote">Hover over any active date block to audit the full Safety Cushion Breakdown for that specific date.</p>
+
+                <div class="cal-header-container">
+                    <button class="cal-nav-btn" onclick="navigateMonth(-1)">‹</button>
+                    <div class="cal-controls">
+                        <select id="calMonth" onchange="renderCalendarView()"></select>
+                        <select id="calYear" onchange="renderCalendarView()"></select>
+                    </div>
+                    <button class="cal-nav-btn" onclick="navigateMonth(1)">›</button>
+                </div>
+
+                <div class="cal-grid" id="calendarGrid"></div>
+
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-color" style="background:#fff;"></div> <span data-i18n="regularDay">Regular Day</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:var(--absent-day); border-color:#fca5a5;"></div> <span data-i18n="absentDay">Absent Day</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:#fef08a; border-color:#fde047;"></div> <span data-i18n="travelDay">Travel Day</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:var(--ilr-milestone); border-color:#3b82f6;"></div> <span data-i18n="ilrDate">ILR Date</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background:var(--citizen-milestone); border-color:#a855f7;"></div> <span data-i18n="citizenshipDate">Citizenship Date</span></div>
+                    <div class="legend-item"><div class="legend-color" style="outline: 2px solid var(--today-border); background: var(--today-bg);"></div> <span data-i18n="today">Today</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 data-i18n="historyTitle">Tracked History Matrix</h2>
+                <div style="overflow-x: auto;">
+                    <table class="trip-table">
+                        <thead>
+                        <tr>
+                            <th data-i18n="destination">Destination</th>
+                            <th data-i18n="departure">Departure</th>
+                            <th data-i18n="arrival">Arrival</th>
+                            <th data-i18n="countedWholeDays">Counted Whole Days</th>
+                            <th data-i18n="action">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tripTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        UK BN(O) Visa Tracker &amp; Compliance Suite by <a href="https://loohpjames.com" target="_blank">LoohpJames</a>
+    </footer>
+</div>
+
+<script>
+
+    const translations = {
+        en: {
+            appTitle: "UK BN(O) Visa Tracker & Compliance Suite",
+            appSubtitle: "Comprehensive monitoring for 5-Year ILR and 6-Year Citizenship pathways.",
+            setupTitle: "1. Setup Timeline Dates",
+            visaGrantDate: "Visa Grant Date",
+            physicalEntryDate: "Physical Date Entered UK",
+            ilrGrantDate: "ILR Granted Date (optional)",
+            ilrGrantDateNote: "Only enter this once ILR has actually been granted. Citizenship will use this date if available.",
+            languageTitle: "Language 語言",
+            languageLabel: "Display Language 顯示語言",
+            travelTitle: "2. Log Additional Travel",
+            destination: "Destination",
+            dateLeftUK: "Date Left UK",
+            dateReturnedUK: "Date Returned to UK",
+            logTrip: "Log Trip",
+            resetClear: "Reset & Clear All Data",
+            backupTitle: "3. Backup / Restore",
+            backupNote: "Export your tracker setup and trips as a JSON backup file, or import a previously exported backup.",
+            downloadBackup: "Download JSON Backup",
+            importFromFile: "Import From File",
+            cushionTitle: "Safety Cushion Breakdown",
+            calendarTitle: "Interactive Travel Calendar",
+            jumpToday: "📅 Jump to Today",
+            historyTitle: "Tracked History Matrix",
+            earliestIlrApplicationDate: "🎉 Earliest ILR Application Date",
+            earliestCitizenshipApplicationDate: "🇬🇧 Earliest Citizenship Application Date",
+            ilrRuleUsed: "<strong>Rule used:</strong> if you entered the UK within 180 days of visa approval, Year 1 starts from the visa grant date and the pre-entry days count as absences; otherwise it is calculated from your physical UK entry date. The earliest application window is then 28 days before the 5-year point.",
+            citizenshipRuleUsed: "<strong>Rule used:</strong> approximated as 1 year after the earliest ILR application date. Actual eligibility depends on the real ILR grant date and citizenship rules at the time.",
+            totalSafeCushion: "🛡️ Total Safe Cushion Remaining Days",
+            limitingBottleneck: "Your limiting critical bottleneck factor.",
+            overallCushionRule: "<strong>How calculated:</strong> the lowest active remaining allowance across the applicable ILR and citizenship absence rules.",
+            ilrRollingRule: "⏳ ILR Rolling 12-Month Rule Remaining Days",
+            cushionVs180: "Cushion vs 180-day limit.",
+            rollingCushionRule: "<strong>How calculated:</strong> 180 minus the highest absence count found in any rolling 365-day window during the ILR qualifying period.",
+            citizenship5YearAccumulation: "🌍 Citizenship 5-Yr Accumulation Remaining Days",
+            cushionVs450: "Cushion vs 450-day Y2-Y6 limit.",
+            citizenTotalRule: "<strong>How calculated:</strong> 450 minus total counted absent days across the citizenship qualifying period used here, Years 2–6.",
+            citizenshipFinalYear: "📅 Citizenship Final Year Remaining Days",
+            cushionVs90: "Cushion vs 90-day Y6 limit.",
+            citizenY6Rule: "<strong>How calculated:</strong> inactive until Year 6 starts; then 90 minus counted absent days in the final qualifying year.",
+            absenceVisualizerTitle: "6-Year Absence Visualizer",
+            absenceVisualizerNote: "Yearly blocks are derived starting from your official Visa Grant date. Years 1–5 monitor the 180-day rolling window.",
+            calendarHoverNote: "Hover over any active date block to audit the full Safety Cushion Breakdown for that specific date.",
+            regularDay: "Regular Day",
+            absentDay: "Absent Day",
+            travelDay: "Travel Day",
+            ilrDate: "ILR Date",
+            citizenshipDate: "Citizenship Date",
+            today: "Today",
+            todayUpper: "TODAY",
+            ilrApplShort: "ILR APPL",
+            passportShort: "PASSPORT",
+            departure: "Departure",
+            arrival: "Arrival",
+            countedWholeDays: "Counted Whole Days",
+            action: "Action",
+            initialEntryDelay: "Initial Entry Delay",
+            initialEntryDelayAutomatic: "Initial Entry Delay (Automatic)",
+            systemLock: "System Lock",
+            delete: "Delete",
+            days: "days",
+            daysTitle: "Days",
+            year: "Year {year}",
+            breached: "Breached",
+            ok: "OK",
+            eligibleToApplyNow: "ELIGIBLE TO APPLY NOW!",
+            potentiallyEligibleNow: "POTENTIALLY ELIGIBLE NOW!",
+            daysRemaining: "{days} days remaining",
+            approxDaysRemaining: "Approx. {days} days remaining",
+            untilEligibilityOpens: "Until eligibility opens.",
+            windowOpenedOn: "Window opened on {date}",
+            assumingApprovalTimes: "Assuming standard settlement approval times.",
+            subjectToIlrGrantDate: "Subject to exact ILR settlement grant date.",
+            usingIlrGrantDate: "Using ILR grant date: {date}.",
+            arrivalBeforeVisa: "⚠️ Error: Arrival entry date cannot be prior to your core Visa Grant date.",
+            entryDelayNotice: "ℹ️ Your entry was delayed by <strong>{days} days</strong>. This counts as absent days in Year 1 calculations.",
+            entryDelayOver180Notice: "⚠️ Your entry was delayed by <strong>{days} days</strong>, which is more than 180 days after visa approval. The first qualifying period therefore starts from your physical UK entry date instead of the visa approval date. The pre-entry period is still shown on the calendar as absence/disqualified time, but it is not used as Year 1 for the active calculation.",
+            statusInsideUkSafe: "Status: Inside UK (Safe)",
+            earliestIlrMilestone: "🎯 EARLIEST ILR APPLICATION MILESTONE",
+            citizenshipMilestone: "🇬🇧 CITIZENSHIP APPLICATION MILESTONE",
+            flightOut: "Flight Out: {destination}",
+            flightIn: "Flight In: {destination}",
+            absentDestination: "Absent: {destination}",
+            statusPrefix: "Status: {status}",
+            daysFromToday: "⏳ {days} days from today",
+            milestoneReached: "✓ Milestone reached",
+            rollingAbsences: "Rolling absences: {days} days",
+            citizenship5YrAccumShort: "Due to Citizenship 5-Yr Accum.",
+            ilrRolling12MonthShort: "Due to ILR Rolling 12-Month",
+            citizenshipFinalYearShort: "Due to Citizenship Final Year",
+            compliantSafe: "✅ 100% Compliant & Safe! Your profile satisfies all active settlement metrics. Your ultimate safety margin is {days} days.",
+            ilrRollingBreach: "❌ ILR Rolling Breach: You exceeded 180 days away within a rolling 12-month window (Peak: {days} days).",
+            citizenshipCumulativeBreach: "❌ Citizenship Cumulative Breach: Combined totals across years 2–6 exceed 450 days ({days} days).",
+            citizenshipFinalYearBreach: "❌ Citizenship Final Year Breach: Year 6 absences exceed strict 90-day limit ({days} days).",
+            importedTrip: "Imported Trip",
+            couldNotReadFile: "Could not read the selected file.",
+            configMustObject: "Config must be a JSON object.",
+            configMustDates: "Config must include valid visaStart and entryDate values in YYYY-MM-DD format.",
+            importSuccess: "Tracker backup imported successfully.",
+            importFailed: "Import failed",
+            invalidBackup: "Invalid tracker backup format.",
+            confirmReset: "Are you sure you want to delete all entries and reset the tracker?",
+            returnBeforeDeparture: "Error: Return date cannot occur before departure.",
+            notActiveYet: "Not Active Yet",
+            noItems: "No items.",
+            disqualifiedPeriod: "Disqualified period",
+            renewedYear: "Renewed Year {year}",
+            renewedStartDate: "New start date: {date}. The qualifying clock is treated as a renewed Year 1 from here.",
+            disqualifiedBadge: "Disqualified",
+            renewedBadge: "Renewed",
+            renewedIlrRuleUsed: "<strong>Rule used:</strong> your previous qualifying period was disqualified by excess absence, so ILR is recalculated from the new favourable start date + 5 years, then minus 28 days.",
+            renewedStatus: "⚠️ Previous period disqualified. Recalculation has restarted from {date}; renewed safety margin is {days} days."
+        },
+        "zh-HK": {
+            appTitle: "英國國民（海外）簽證居留追蹤工具",
+            appSubtitle: "追蹤 5 年永久居留及 6 年入籍申請資格。",
+            setupTitle: "1. 設定重要日期",
+            visaGrantDate: "簽證批出日期",
+            physicalEntryDate: "實際到達英國日期",
+            ilrGrantDate: "永久居留批出日期（可選）",
+            ilrGrantDateNote: "只在永久居留已正式批出後填寫。如有填寫，入籍日期會以此日期計算。",
+            languageTitle: "語言 Language",
+            languageLabel: "顯示語言 Display Language",
+            travelTitle: "2. 記錄離境行程",
+            destination: "目的地",
+            dateLeftUK: "離開英國日期",
+            dateReturnedUK: "返回英國日期",
+            logTrip: "新增行程",
+            resetClear: "清除所有資料並重設",
+            backupTitle: "3. 備份／還原資料",
+            backupNote: "可將目前設定及行程匯出做備份，之後亦可重新匯入。",
+            downloadBackup: "下載 JSON 備份",
+            importFromFile: "匯入備份檔",
+            cushionTitle: "尚可離境日數分析",
+            calendarTitle: "出入境日曆",
+            jumpToday: "📅 跳至今日",
+            historyTitle: "行程記錄",
+            earliestIlrApplicationDate: "🎉 最早可申請永久居留日期",
+            earliestCitizenshipApplicationDate: "🇬🇧 最早可申請入籍日期",
+            ilrRuleUsed: "<strong>採用規則：</strong>如你在簽證批出後 180 日內到達英國，第 1 年會由簽證批出日期起計，而到達英國前的日子會計作離境日；否則會由實際到達英國日期起計。最早申請日期為 5 年期滿前 28 日。",
+            citizenshipRuleUsed: "<strong>採用規則：</strong>暫以最早可申請永久居留日期後 1 年估算。實際資格須視乎永久居留正式批出日期及當時入籍規定。",
+            totalSafeCushion: "🛡️ 尚可離境日數",
+            limitingBottleneck: "以目前最嚴格的一項離境限制計算。",
+            overallCushionRule: "<strong>計算方法：</strong>在適用的永久居留及入籍離境規則中，取最低的剩餘可用日數。",
+            ilrRollingRule: "⏳ 尚餘永久居留 12 個月滾動限制日數",
+            cushionVs180: "距離 180 日上限尚餘的日數。",
+            rollingCushionRule: "<strong>計算方法：</strong>180 減去永久居留合資格期間內，任何滾動 365 日期間錄得的最高離境日數。",
+            citizenship5YearAccumulation: "🌍 尚餘入籍 5 年累計離境日數",
+            cushionVs450: "距離第 2 至第 6 年 450 日上限尚餘的日數。",
+            citizenTotalRule: "<strong>計算方法：</strong>450 減去此工具採用的入籍合資格期間（第 2 至第 6 年）累計離境日數。",
+            citizenshipFinalYear: "📅 尚餘入籍最後一年限制日數",
+            cushionVs90: "距離第 6 年 90 日上限尚餘的日數。",
+            citizenY6Rule: "<strong>計算方法：</strong>第 6 年開始前不適用；開始後以 90 減去最後合資格年度內的離境日數。",
+            absenceVisualizerTitle: "6 年離境紀錄總覽",
+            absenceVisualizerNote: "每年會根據簽證批出日期計算，第 1 至第 5 年會監察 180 日滾動限制。",
+            calendarHoverNote: "將滑鼠移到日期上，可查看該日詳細的尚可離境日數。",
+            regularDay: "普通日子",
+            absentDay: "不在英國",
+            travelDay: "出入境",
+            ilrDate: "永久居留日期",
+            citizenshipDate: "入籍日期",
+            today: "今日",
+            todayUpper: "今日",
+            ilrApplShort: "永居申請",
+            passportShort: "護照",
+            departure: "離境",
+            arrival: "入境",
+            countedWholeDays: "計算離境日數",
+            action: "操作",
+            initialEntryDelay: "延遲入境",
+            initialEntryDelayAutomatic: "延遲入境（系統自動計算）",
+            systemLock: "系統項目",
+            delete: "刪除",
+            days: "日",
+            daysTitle: "日",
+            year: "第 {year} 年",
+            breached: "超標",
+            ok: "合規",
+            eligibleToApplyNow: "現已可申請！",
+            potentiallyEligibleNow: "可能已符合資格！",
+            daysRemaining: "尚餘 {days} 日",
+            approxDaysRemaining: "大約尚餘 {days} 日",
+            untilEligibilityOpens: "距離開放申請尚有時間。",
+            windowOpenedOn: "申請窗口已於 {date} 開始",
+            assumingApprovalTimes: "以一般永久居留審批時間作估算。",
+            subjectToIlrGrantDate: "實際日期仍須視乎永久居留正式批出時間。",
+            usingIlrGrantDate: "使用永久居留批出日期：{date}。",
+            arrivalBeforeVisa: "⚠️ 入境日期不能早於簽證批出日期。",
+            entryDelayNotice: "ℹ️ 你於簽證批出後延遲 <strong>{days} 日</strong> 才入境英國，系統會將該段時間計入第 1 年離境日數。",
+            entryDelayOver180Notice: "⚠️ 你於簽證批出後延遲 <strong>{days} 日</strong> 才入境英國，已超過 180 日。因此第一個合資格期間會由實際到達英國日期開始，而不是簽證批出日期。到達英國前的期間仍會在日曆中顯示為離境／不合資格期間，但不會作為目前有效計算的第 1 年。",
+            statusInsideUkSafe: "狀態：身處英國",
+            earliestIlrMilestone: "🎯 最早可申請永久居留日期",
+            citizenshipMilestone: "🇬🇧 最早可申請入籍日期",
+            flightOut: "離境：{destination}",
+            flightIn: "回英國：{destination}",
+            absentDestination: "不在英國：{destination}",
+            statusPrefix: "狀態：{status}",
+            daysFromToday: "⏳ 尚餘 {days} 日",
+            milestoneReached: "✓ 已達申請日期",
+            rollingAbsences: "12 個月滾動離境：{days} 日",
+            citizenship5YrAccumShort: "基於入籍 5 年累計",
+            ilrRolling12MonthShort: "基於永久居留 12 個月限制",
+            citizenshipFinalYearShort: "基於入籍最後一年",
+            compliantSafe: "✅ 目前符合所有永久居留及入籍離境要求，尚可離境日數為 {days} 日。",
+            ilrRollingBreach: "❌ 你曾於某個 12 個月期間離境超過 180 日（最高 {days} 日），未符合永久居留要求。",
+            citizenshipCumulativeBreach: "❌ 第 2 至第 6 年累計離境超過 450 日（目前 {days} 日），未符合入籍要求。",
+            citizenshipFinalYearBreach: "❌ 入籍前最後一年離境超過 90 日限制（目前 {days} 日）。",
+            importedTrip: "已匯入行程",
+            couldNotReadFile: "無法讀取所選檔案。",
+            configMustObject: "設定必須為 JSON 物件。",
+            configMustDates: "設定必須包含有效的 visaStart 及 entryDate，格式為 YYYY-MM-DD。",
+            importSuccess: "已成功匯入備份。",
+            importFailed: "匯入失敗",
+            invalidBackup: "備份檔格式不正確。",
+            confirmReset: "確定要清除所有資料並重設？",
+            returnBeforeDeparture: "返回日期不能早於離境日期。",
+            notActiveYet: "尚未生效",
+            noItems: "暫時未有任何記錄。",
+            disqualifiedPeriod: "不合資格期間",
+            renewedYear: "重新計算第 {year} 年",
+            renewedStartDate: "重新計算起計日期：{date}。系統會由此日起視為重新第 1 年。",
+            disqualifiedBadge: "不合資格",
+            renewedBadge: "重新計算",
+            renewedIlrRuleUsed: "<strong>採用規則：</strong>之前的合資格期間因離境日數超標而不合資格，因此永久居留日期會由新的有利起計日期起計 5 年，再扣減 28 日。",
+            renewedStatus: "⚠️ 之前期間已不合資格。系統已由 {date} 重新計算；重新計算後尚可離境日數為 {days} 日。"
+        }
+    };
+
+    let currentLanguage = localStorage.getItem('bno_language') || 'en';
+
+    function t(key, params = {}) {
+        let template = (translations[currentLanguage] && translations[currentLanguage][key]) || translations.en[key] || key;
+        Object.keys(params).forEach(paramKey => {
+            template = template.replaceAll(`{${paramKey}}`, params[paramKey]);
+        });
+        return template;
+    }
+
+    function getLocale() {
+        return currentLanguage === 'zh-HK' ? 'zh-HK' : 'en-GB';
+    }
+
+    function applyLanguage() {
+        document.documentElement.lang = currentLanguage === 'zh-HK' ? 'zh-HK' : 'en';
+        const selector = document.getElementById('languageSelect');
+        if (selector) selector.value = currentLanguage;
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            el.innerText = t(key);
+        });
+
+        document.querySelectorAll('[data-i18n-html]').forEach(el => {
+            const key = el.getAttribute('data-i18n-html');
+            el.innerHTML = t(key);
+        });
+
+        document.documentElement.style.setProperty('--label-ilr-appl', JSON.stringify(t("ilrApplShort")));
+        document.documentElement.style.setProperty('--label-passport', JSON.stringify(t("passportShort")));
+        document.documentElement.style.setProperty('--label-today', JSON.stringify(t("todayUpper")));
+
+        const destinationInput = document.getElementById('destination');
+        if (destinationInput) {
+            destinationInput.placeholder = currentLanguage === 'zh-HK' ? "例如：暑假旅行" : "e.g., Summer Holiday";
+        }
+    }
+
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        localStorage.setItem('bno_language', lang);
+        applyLanguage();
+        updateTimeline();
+        populateCalendarSelectors();
+        restoreCalendarViewState();
+    }
+
+    // --- LONDON / DAYLIGHT-SAVING-SAFE DATE UTILITIES ---
+    // All user-entered dates are treated as UK civil calendar dates, not as UTC timestamps.
+    // Europe/London lets Intl automatically apply GMT/BST daylight-saving rules for display and "today".
+    const APP_TIMEZONE = 'Europe/London';
+
+    function getLondonDateParts(dateObj = new Date()) {
+        const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: APP_TIMEZONE,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).formatToParts(dateObj);
+
+        return {
+            year: parts.find(p => p.type === 'year').value,
+            month: parts.find(p => p.type === 'month').value,
+            day: parts.find(p => p.type === 'day').value
+        };
+    }
+
+    function getLondonTodayString() {
+        const { year, month, day } = getLondonDateParts(new Date());
+        return `${year}-${month}-${day}`;
+    }
+
+    function parseLocalDate(dateStr) {
+        // Date inputs provide YYYY-MM-DD. Build a local Date at noon to avoid midnight DST edge cases.
+        // Calendar-day maths below converts back to UTC day numbers, so the browser timezone cannot skew counts.
+        if (!dateStr) dateStr = getLondonTodayString();
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return new Date(y, m - 1, d, 12, 0, 0, 0);
+    }
+
+    function formatDateLocal(dateObj) {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function formatDateForDisplay(dateObj, options = { year: 'numeric', month: 'long', day: 'numeric' }) {
+        return dateObj.toLocaleDateString(getLocale(), { ...options, timeZone: APP_TIMEZONE });
+    }
+
+    function localDateDayNumber(dateObj) {
+        // Use UTC day numbers based on the civil date fields so daylight-saving clock changes cannot
+        // add or remove a calendar day. This is the core protection against BST/GMT off-by-one errors.
+        return Math.floor(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()) / 86400000);
+    }
+
+    function calendarDayDiff(startDate, endDate) {
+        return localDateDayNumber(endDate) - localDateDayNumber(startDate);
+    }
+
+    // --- SYSTEM STATE VARIABLES ---
+    let trips = [];
+    let nextId = 1;
+    let visaYears = [];
+    let initialEntryDelayDays = 0;
+    let globalAbsenceMap = {};
+    let dailyRollingAbsencesMap = {};
+    let previousDailyRollingAbsencesMap = {};
+    let cachedILRDateString = "";
+    let cachedCitizenDateString = "";
+    let activeQualifyingStartDate = null;
+    let displayedTimelineYears = [];
+    let previousVisaYears = [];
+    let renewalInfo = null;
+
+    const TODAY_ANCHOR = parseLocalDate(getLondonTodayString());
+
+    window.onload = function() {
+        applyLanguage();
+        document.getElementById('dateOut').value = formatDateLocal(TODAY_ANCHOR);
+        document.getElementById('dateIn').value = formatDateLocal(TODAY_ANCHOR);
+
+        loadSavedData();
+        populateCalendarSelectors();
+        restoreCalendarViewState();
+        updateTimeline();
+    };
+
+    function loadSavedData() {
+        if (localStorage.getItem('bno_visaStart')) {
+            document.getElementById('visaStart').value = localStorage.getItem('bno_visaStart');
+        }
+        if (localStorage.getItem('bno_entryDate')) {
+            document.getElementById('entryDate').value = localStorage.getItem('bno_entryDate');
+        }
+        if (localStorage.getItem('bno_ilrGrantDate')) {
+            const ilrGrantInput = document.getElementById('ilrGrantDate');
+            if (ilrGrantInput) ilrGrantInput.value = localStorage.getItem('bno_ilrGrantDate');
+        }
+
+        const storedTrips = localStorage.getItem('bno_trips_list');
+        const storedNextId = localStorage.getItem('bno_nextId');
+
+        if (storedTrips) {
+            trips = JSON.parse(storedTrips);
+            nextId = parseInt(storedNextId) || 1;
+        } else {
+            trips = [{ id: 1, destination: "Hong Kong (Demo)", out: "2022-03-10", in: "2022-03-25" }];
+            nextId = 2;
+        }
+    }
+
+    function populateCalendarSelectors() {
+        const months = Array.from({ length: 12 }, (_, idx) => formatDateForDisplay(new Date(2020, idx, 1, 12), { month: 'long' }));
+        const mSelect = document.getElementById('calMonth');
+        mSelect.innerHTML = '';
+        months.forEach((m, idx) => {
+            mSelect.innerHTML += `<option value="${idx}">${m}</option>`;
+        });
+
+        const currentYear = TODAY_ANCHOR.getFullYear();
+        const ySelect = document.getElementById('calYear');
+        ySelect.innerHTML = '';
+        for (let y = currentYear - 6; y <= currentYear + 6; y++) {
+            ySelect.innerHTML += `<option value="${y}">${y}</option>`;
+        }
+    }
+
+    function getCurrentCalendarView() {
+        return {
+            month: parseInt(document.getElementById('calMonth').value),
+            year: parseInt(document.getElementById('calYear').value)
+        };
+    }
+
+    function saveCalendarViewState() {
+        const view = getCurrentCalendarView();
+        if (!Number.isNaN(view.month) && !Number.isNaN(view.year)) {
+            localStorage.setItem('bno_calendar_month', view.month);
+            localStorage.setItem('bno_calendar_year', view.year);
+        }
+    }
+
+    function ensureCalendarYearOption(year) {
+        const ySelect = document.getElementById('calYear');
+        const exists = Array.from(ySelect.options).some(option => parseInt(option.value) === year);
+        if (!exists) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            ySelect.appendChild(option);
+            Array.from(ySelect.options)
+                .sort((a, b) => parseInt(a.value) - parseInt(b.value))
+                .forEach(optionNode => ySelect.appendChild(optionNode));
+        }
+    }
+
+    function setCalendarView(month, year, shouldRender = true) {
+        const safeMonth = Math.min(11, Math.max(0, parseInt(month)));
+        const safeYear = parseInt(year);
+        if (Number.isNaN(safeMonth) || Number.isNaN(safeYear)) return;
+
+        ensureCalendarYearOption(safeYear);
+        document.getElementById('calMonth').value = safeMonth;
+        document.getElementById('calYear').value = safeYear;
+        saveCalendarViewState();
+
+        if (shouldRender) renderCalendarView();
+    }
+
+    function restoreCalendarViewState() {
+        const storedMonth = localStorage.getItem('bno_calendar_month');
+        const storedYear = localStorage.getItem('bno_calendar_year');
+
+        if (storedMonth !== null && storedYear !== null) {
+            setCalendarView(storedMonth, storedYear, false);
+        } else {
+            setCalendarView(TODAY_ANCHOR.getMonth(), TODAY_ANCHOR.getFullYear(), false);
+        }
+    }
+
+    function jumpToToday() {
+        setCalendarView(TODAY_ANCHOR.getMonth(), TODAY_ANCHOR.getFullYear());
+    }
+
+    function navigateMonth(direction) {
+        let currentMonth = parseInt(document.getElementById('calMonth').value);
+        let currentYear = parseInt(document.getElementById('calYear').value);
+
+        currentMonth += direction;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+
+        const yearSelector = document.getElementById('calYear');
+        const options = Array.from(yearSelector.options).map(o => parseInt(o.value));
+
+        setCalendarView(currentMonth, currentYear);
+    }
+
+    function saveCalendarState() {
+        localStorage.setItem('bno_calendarMonth', document.getElementById('calMonth').value);
+        localStorage.setItem('bno_calendarYear', document.getElementById('calYear').value);
+    }
+
+    function saveTimelineSettings() {
+        localStorage.setItem('bno_visaStart', document.getElementById('visaStart').value);
+        localStorage.setItem('bno_entryDate', document.getElementById('entryDate').value);
+        const ilrGrantInput = document.getElementById('ilrGrantDate');
+        if (ilrGrantInput) {
+            if (ilrGrantInput.value) localStorage.setItem('bno_ilrGrantDate', ilrGrantInput.value);
+            else localStorage.removeItem('bno_ilrGrantDate');
+        }
+        updateTimeline();
+    }
+
+    function saveTripsToStorage() {
+        localStorage.setItem('bno_trips_list', JSON.stringify(trips));
+        localStorage.setItem('bno_nextId', nextId);
+    }
+
+    function clearAllData() {
+        if (confirm(t("confirmReset"))) {
+            localStorage.clear();
+            document.getElementById('visaStart').value = "2021-06-01";
+            document.getElementById('entryDate').value = "2021-06-15";
+            const ilrGrantInput = document.getElementById('ilrGrantDate');
+            if (ilrGrantInput) ilrGrantInput.value = "";
+            trips = [];
+            nextId = 1;
+            saveTimelineSettings();
+            jumpToToday();
+        }
+    }
+
+    function calculateWholeDays(outStr, inStr) {
+        const dOut = parseLocalDate(outStr);
+        const dIn = parseLocalDate(inStr);
+        const diffDays = calendarDayDiff(dOut, dIn);
+        if (diffDays <= 0) return 0;
+        return diffDays - 1;
+    }
+
+    function updateTimeline() {
+        const visaStartStr = document.getElementById('visaStart').value;
+        const entryDateStr = document.getElementById('entryDate').value;
+        if (!visaStartStr || !entryDateStr) return;
+
+        const vStart = parseLocalDate(visaStartStr);
+        const eDate = parseLocalDate(entryDateStr);
+        const delayDays = calendarDayDiff(vStart, eDate);
+        const warningBox = document.getElementById('delayWarning');
+
+        if (delayDays < 0) {
+            warningBox.style.display = "block";
+            warningBox.innerText = t("arrivalBeforeVisa");
+            initialEntryDelayDays = 0;
+            return;
+        }
+
+        initialEntryDelayDays = delayDays;
+        warningBox.style.display = initialEntryDelayDays > 0 ? "block" : "none";
+        if (initialEntryDelayDays > 180) {
+            warningBox.innerHTML = t("entryDelayOver180Notice", { days: initialEntryDelayDays });
+        } else if (initialEntryDelayDays > 0) {
+            warningBox.innerHTML = t("entryDelayNotice", { days: initialEntryDelayDays });
+        }
+
+        visaYears = [];
+        let currentStart = new Date(vStart);
+
+        for (let i = 1; i <= 6; i++) {
+            let currentEnd = new Date(currentStart);
+            currentEnd.setFullYear(currentEnd.getFullYear() + 1);
+            currentEnd.setDate(currentEnd.getDate() - 1);
+
+            visaYears.push({
+                yearNum: i,
+                start: new Date(currentStart),
+                end: new Date(currentEnd),
+                absences: (i === 1) ? initialEntryDelayDays : 0
+            });
+
+            currentStart = new Date(currentEnd);
+            currentStart.setDate(currentStart.getDate() + 1);
+        }
+
+        processAbsences();
+    }
+
+    function calculateApplicationDates(visaStartDate, physicalEntryDate) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const effectiveStart = activeQualifyingStartDate || physicalEntryDate;
+        const isRenewed = !!renewalInfo;
+
+        let earliestILRDate = new Date(effectiveStart);
+        earliestILRDate.setFullYear(earliestILRDate.getFullYear() + 5);
+        earliestILRDate.setDate(earliestILRDate.getDate() - 28);
+
+        cachedILRDateString = formatDateLocal(earliestILRDate);
+        document.getElementById('ilrTargetDate').innerText = formatDateForDisplay(earliestILRDate, options);
+
+        const ilrRule = document.querySelector('[data-i18n-html="ilrRuleUsed"]');
+        if (ilrRule) ilrRule.innerHTML = isRenewed ? t('renewedIlrRuleUsed') : t('ilrRuleUsed');
+
+        const ilrDaysLeft = calendarDayDiff(TODAY_ANCHOR, earliestILRDate);
+
+        if (ilrDaysLeft > 0) {
+            document.getElementById('ilrCountdown').innerText = t('daysRemaining', { days: ilrDaysLeft });
+            document.getElementById('ilrDateMeta').innerText = isRenewed
+                ? t('renewedStartDate', { date: formatDateForDisplay(effectiveStart, options) })
+                : t('untilEligibilityOpens');
+        } else {
+            document.getElementById('ilrCountdown').innerText = t('eligibleToApplyNow');
+            document.getElementById('ilrDateMeta').innerText = t('windowOpenedOn', { date: formatDateForDisplay(earliestILRDate, options) });
+        }
+
+        const ilrGrantInput = document.getElementById('ilrGrantDate');
+        const ilrGrantDateStr = ilrGrantInput ? ilrGrantInput.value : "";
+        const hasIlrGrantDate = !!ilrGrantDateStr;
+        const citizenshipBaseDate = hasIlrGrantDate ? parseLocalDate(ilrGrantDateStr) : earliestILRDate;
+
+        let targetCitizenDate = new Date(citizenshipBaseDate);
+        targetCitizenDate.setFullYear(targetCitizenDate.getFullYear() + 1);
+
+        cachedCitizenDateString = formatDateLocal(targetCitizenDate);
+        document.getElementById('citizenTargetDate').innerText = formatDateForDisplay(targetCitizenDate, options);
+
+        const citizenDaysLeft = calendarDayDiff(TODAY_ANCHOR, targetCitizenDate);
+
+        if (citizenDaysLeft > 0) {
+            document.getElementById('citizenCountdown').innerText = t('approxDaysRemaining', { days: citizenDaysLeft });
+            document.getElementById('citizenDateMeta').innerText = hasIlrGrantDate
+                ? t('usingIlrGrantDate', { date: formatDateForDisplay(citizenshipBaseDate, options) })
+                : t('assumingApprovalTimes');
+        } else {
+            document.getElementById('citizenCountdown').innerText = t('potentiallyEligibleNow');
+            document.getElementById('citizenDateMeta').innerText = hasIlrGrantDate
+                ? t('usingIlrGrantDate', { date: formatDateForDisplay(citizenshipBaseDate, options) })
+                : t('subjectToIlrGrantDate');
+        }
+    }
+
+    function buildYearBlocks(startDate, count = 6, options = {}) {
+        const years = [];
+        let currentStart = new Date(startDate);
+        for (let i = 1; i <= count; i++) {
+            let currentEnd = new Date(currentStart);
+            currentEnd.setFullYear(currentEnd.getFullYear() + 1);
+            currentEnd.setDate(currentEnd.getDate() - 1);
+            years.push({
+                yearNum: i,
+                start: new Date(currentStart),
+                end: new Date(currentEnd),
+                absences: 0,
+                displayType: options.displayType || 'active',
+                displayLabel: options.displayLabel || null,
+                renewed: !!options.renewed
+            });
+            currentStart = new Date(currentEnd);
+            currentStart.setDate(currentStart.getDate() + 1);
+        }
+        return years;
+    }
+
+    function countAbsencesBetween(startDate, endDate) {
+        let count = 0;
+        let checkDate = new Date(startDate);
+        while (checkDate <= endDate) {
+            const key = formatDateLocal(checkDate);
+            if (globalAbsenceMap[key] && globalAbsenceMap[key].type === 'absent') count++;
+            checkDate.setDate(checkDate.getDate() + 1);
+        }
+        return count;
+    }
+
+    function assignAbsencesToYears(years) {
+        years.forEach(y => { y.absences = countAbsencesBetween(y.start, y.end); });
+    }
+
+    function evaluateRollingForYears(years, targetMap = dailyRollingAbsencesMap) {
+        let rollingBreachDetected = false;
+        let worstRollingPeriod = 0;
+        let firstBreachDate = null;
+        const totalTimelineStart = years[0].start;
+        const ilrEnd = years[4].end;
+        const totalTimelineEnd = years[5].end;
+        let loopDate = new Date(totalTimelineStart);
+
+        while (loopDate <= totalTimelineEnd) {
+            let rollingAbsences = 0;
+            for (let i = 0; i < 365; i++) {
+                let checkDate = new Date(loopDate);
+                checkDate.setDate(loopDate.getDate() - i);
+                if (checkDate < totalTimelineStart) break;
+                let dateKey = formatDateLocal(checkDate);
+                if (globalAbsenceMap[dateKey] && globalAbsenceMap[dateKey].type === 'absent') rollingAbsences++;
+            }
+            targetMap[formatDateLocal(loopDate)] = rollingAbsences;
+            if (loopDate <= ilrEnd) {
+                if (rollingAbsences > worstRollingPeriod) worstRollingPeriod = rollingAbsences;
+                if (rollingAbsences > 180) {
+                    rollingBreachDetected = true;
+                    if (!firstBreachDate) firstBreachDate = new Date(loopDate);
+                }
+            }
+            loopDate.setDate(loopDate.getDate() + 1);
+        }
+        return { rollingBreachDetected, worstRollingPeriod, firstBreachDate };
+    }
+
+    function isInUkDate(dateObj) {
+        const status = globalAbsenceMap[formatDateLocal(dateObj)];
+        return !status || status.type !== 'absent';
+    }
+
+    function addDays(dateObj, days) {
+        const result = new Date(dateObj);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
+
+    function daysBetweenInclusive(startDate, endDate) {
+        return calendarDayDiff(startDate, endDate) + 1;
+    }
+
+    function hasRollingBreachFromCandidate(candidateStart) {
+        const testYears = buildYearBlocks(candidateStart, 6, { displayType: 'active', renewed: true });
+        const ilrEnd = testYears[4].end;
+        const totalDays = daysBetweenInclusive(candidateStart, ilrEnd);
+        const prefixAbsences = new Array(totalDays + 1).fill(0);
+
+        for (let offset = 0; offset < totalDays; offset++) {
+            const dateKey = formatDateLocal(addDays(candidateStart, offset));
+            const isAbsent = globalAbsenceMap[dateKey] && globalAbsenceMap[dateKey].type === 'absent' ? 1 : 0;
+            prefixAbsences[offset + 1] = prefixAbsences[offset] + isAbsent;
+        }
+
+        for (let endOffset = 0; endOffset < totalDays; endOffset++) {
+            const startOffset = Math.max(0, endOffset - 364);
+            const rollingAbsences = prefixAbsences[endOffset + 1] - prefixAbsences[startOffset];
+            if (rollingAbsences > 180) return true;
+        }
+
+        return false;
+    }
+
+    function findMostFavourableRenewedStart(originalStart, originalYears) {
+        const searchEnd = new Date(originalYears[5].end);
+        let candidate = addDays(originalStart, 1);
+
+        while (candidate <= searchEnd) {
+            // A renewed qualifying period must start from a day the person is back in the UK.
+            // For a long disqualifying absence, this will normally be the return date itself
+            // because travel/arrival days are not counted as whole absent days.
+            if (isInUkDate(candidate) && !hasRollingBreachFromCandidate(candidate)) {
+                return new Date(candidate);
+            }
+            candidate.setDate(candidate.getDate() + 1);
+        }
+        return null;
+    }
+
+    function processAbsences() {
+        const visaStartStr = document.getElementById('visaStart').value;
+        const entryDateStr = document.getElementById('entryDate').value;
+        const vStart = parseLocalDate(visaStartStr);
+        const eDate = parseLocalDate(entryDateStr);
+
+        globalAbsenceMap = {};
+        if (initialEntryDelayDays > 0) {
+            for (let d = 0; d < initialEntryDelayDays; d++) {
+                let absentDate = new Date(vStart);
+                absentDate.setDate(vStart.getDate() + d);
+                globalAbsenceMap[formatDateLocal(absentDate)] = { type: 'absent', labelKey: 'initialEntryDelay' };
+            }
+        }
+
+        trips.forEach(trip => {
+            let current = parseLocalDate(trip.out);
+            const tripIn = parseLocalDate(trip.in);
+            const keyOut = formatDateLocal(current);
+            const keyIn = formatDateLocal(tripIn);
+
+            if (!globalAbsenceMap[keyOut]) globalAbsenceMap[keyOut] = { type: 'travel', label: t('flightOut', { destination: trip.destination }) };
+            if (!globalAbsenceMap[keyIn]) globalAbsenceMap[keyIn] = { type: 'travel', label: t('flightIn', { destination: trip.destination }) };
+
+            current.setDate(current.getDate() + 1);
+            while (current < tripIn) {
+                globalAbsenceMap[formatDateLocal(current)] = { type: 'absent', label: t('absentDestination', { destination: trip.destination }) };
+                current.setDate(current.getDate() + 1);
+            }
+        });
+
+        const originalQualifyingStart = initialEntryDelayDays <= 180 ? vStart : eDate;
+        activeQualifyingStartDate = new Date(originalQualifyingStart);
+        renewalInfo = null;
+        previousVisaYears = [];
+        previousDailyRollingAbsencesMap = {};
+        let baseYears = buildYearBlocks(originalQualifyingStart, 6, { displayType: 'active' });
+        assignAbsencesToYears(baseYears);
+
+        dailyRollingAbsencesMap = {};
+        let rollingResult = evaluateRollingForYears(baseYears, dailyRollingAbsencesMap);
+
+        if (rollingResult.rollingBreachDetected) {
+            const renewedStart = findMostFavourableRenewedStart(originalQualifyingStart, baseYears);
+            if (renewedStart) {
+                previousVisaYears = baseYears.map(y => ({ ...y, displayType: 'disqualified' }));
+                previousDailyRollingAbsencesMap = { ...dailyRollingAbsencesMap };
+                const disqualifiedYears = previousVisaYears;
+                activeQualifyingStartDate = new Date(renewedStart);
+                renewalInfo = { start: new Date(renewedStart), previousWorstRolling: rollingResult.worstRollingPeriod };
+                visaYears = buildYearBlocks(renewedStart, 6, { displayType: 'active', renewed: true });
+                assignAbsencesToYears(visaYears);
+                dailyRollingAbsencesMap = {};
+                rollingResult = evaluateRollingForYears(visaYears, dailyRollingAbsencesMap);
+                displayedTimelineYears = [
+                    ...disqualifiedYears,
+                    { marker: true, start: new Date(renewedStart) },
+                    ...visaYears
+                ];
+            } else {
+                visaYears = baseYears;
+                displayedTimelineYears = baseYears;
+            }
+        } else {
+            visaYears = baseYears;
+            displayedTimelineYears = baseYears;
+        }
+
+        calculateApplicationDates(vStart, activeQualifyingStartDate);
+        renderDOM(rollingResult.rollingBreachDetected, rollingResult.worstRollingPeriod);
+        renderCalendarView();
+    }
+
+    function getCushionBreakdownForDate(dateStr) {
+        const hoverDate = parseLocalDate(dateStr);
+        const isPreviousDisqualifiedPeriod = !!(renewalInfo && previousVisaYears.length >= 6 && hoverDate < renewalInfo.start);
+        const yearsForDate = isPreviousDisqualifiedPeriod ? previousVisaYears : visaYears;
+        const rollingMapForDate = isPreviousDisqualifiedPeriod ? previousDailyRollingAbsencesMap : dailyRollingAbsencesMap;
+
+        const rollingCount = rollingMapForDate[dateStr] || 0;
+        const rollingCushion = Math.max(0, 180 - rollingCount);
+
+        // 1. Calculate Citizenship 5-Yr Accumulation (Years 2-6) up to the hovered date,
+        // using the timeline that date belongs to. Old dates stay tied to the disqualified
+        // timeline; renewed dates use the renewed Year 1 timeline.
+        let absencesUpToHover = 0;
+        if (yearsForDate.length >= 6 && hoverDate >= yearsForDate[1].start) {
+            const startOfQualifyingPeriod = yearsForDate[1].start; // Start of Year 2 for that timeline
+            const endLimit = hoverDate > yearsForDate[5].end ? yearsForDate[5].end : hoverDate;
+            let checkDate = new Date(startOfQualifyingPeriod);
+
+            while (checkDate <= endLimit) {
+                const checkStr = formatDateLocal(checkDate);
+                if (globalAbsenceMap[checkStr] && globalAbsenceMap[checkStr].type === 'absent') {
+                    absencesUpToHover++;
+                }
+                checkDate.setDate(checkDate.getDate() + 1);
+            }
+        }
+        const citizenTotalCushion = Math.max(0, 450 - absencesUpToHover);
+
+        // 2. Calculate Citizenship Final Year for the date's own timeline.
+        let y6AbsencesUpToHover = 0;
+        let isHoverDateInYear6 = false;
+
+        if (yearsForDate.length >= 6) {
+            const y6Start = yearsForDate[5].start;
+            const y6End = yearsForDate[5].end;
+
+            if (hoverDate >= y6Start) {
+                isHoverDateInYear6 = true;
+                let checkDate = new Date(y6Start);
+                const endLimit = (hoverDate > y6End) ? y6End : hoverDate;
+
+                while (checkDate <= endLimit) {
+                    const checkStr = formatDateLocal(checkDate);
+                    if (globalAbsenceMap[checkStr] && globalAbsenceMap[checkStr].type === 'absent') {
+                        y6AbsencesUpToHover++;
+                    }
+                    checkDate.setDate(checkDate.getDate() + 1);
+                }
+            }
+        }
+        const citizenY6Cushion = Math.max(0, 90 - y6AbsencesUpToHover);
+
+        // 3. Determine Overall Safe Cushion Bottleneck
+        // Only include the 90-day Year 6 rule if the hovered date is actually in Year 6.
+        let overallCushion = Math.min(rollingCushion, citizenTotalCushion);
+        if (isHoverDateInYear6) {
+            overallCushion = Math.min(overallCushion, citizenY6Cushion);
+        }
+
+        return {
+            rollingCount,
+            rollingCushion,
+            citizenTotalCushion,
+            citizenY6Cushion,
+            overallCushion,
+            isHoverDateInYear6,
+            isPreviousDisqualifiedPeriod
+        };
+    }
+
+    function renderCalendarView() {
+        const targetMonth = parseInt(document.getElementById('calMonth').value);
+        const targetYear = parseInt(document.getElementById('calYear').value);
+        if (Number.isNaN(targetMonth) || Number.isNaN(targetYear)) return;
+        saveCalendarViewState();
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+
+        const dayLabels = Array.from({ length: 7 }, (_, idx) => formatDateForDisplay(new Date(2020, 10, idx + 1, 12), { weekday: 'short' }));
+        dayLabels.forEach(label => { grid.innerHTML += `<div class="cal-day-label">${label}</div>`; });
+
+        const firstDay = new Date(targetYear, targetMonth, 1).getDay();
+        const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) { grid.innerHTML += `<div class="cal-cell empty"></div>`; }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const thisDate = new Date(targetYear, targetMonth, day);
+            const visaApprovalDate = parseLocalDate(document.getElementById('visaStart').value);
+
+            // Dates before visa approval are outside the tracker period, so keep them blank.
+            if (thisDate < visaApprovalDate) {
+                grid.innerHTML += `<div class="cal-cell empty"></div>`;
+                continue;
+            }
+
+            const dateStr = formatDateLocal(thisDate);
+            const isToday = (formatDateLocal(thisDate) === formatDateLocal(TODAY_ANCHOR));
+
+            let extraClass = isToday ? 'today ' : '';
+            let statusLabelText = t('statusInsideUkSafe');
+
+            const isILRDay = (dateStr === cachedILRDateString);
+            const isCitizenDay = (dateStr === cachedCitizenDateString);
+
+            if (isILRDay) {
+                extraClass += 'ilr-milestone-day ';
+                statusLabelText = t('earliestIlrMilestone');
+            } else if (isCitizenDay) {
+                extraClass += 'citizen-milestone-day ';
+                statusLabelText = t('citizenshipMilestone');
+            }
+
+            if (globalAbsenceMap[dateStr]) {
+                const status = globalAbsenceMap[dateStr];
+                if (status.type === 'absent') {
+                    extraClass += 'absent ';
+                    statusLabelText = t('statusPrefix', { status: status.label || t(status.labelKey) });
+                } else if (status.type === 'travel') {
+                    extraClass += 'travel-day ';
+                    statusLabelText = t('statusPrefix', { status: status.label || t(status.labelKey) });
+                }
+            }
+
+            const cushion = getCushionBreakdownForDate(dateStr);
+            const rollingCount = cushion.rollingCount;
+
+            let milestoneCountdownText = "";
+            const msDiff = thisDate - TODAY_ANCHOR;
+            const msDays = Math.ceil(msDiff / (1000 * 60 * 60 * 24));
+            if (isILRDay || isCitizenDay) {
+                milestoneCountdownText = msDays > 0 ? `<br><span style="color:#fef08a;">${t('daysFromToday', { days: msDays })}</span>` : `<br><span style="color:#4ade80;">${t('milestoneReached')}</span>`;
+            }
+
+            // Build the Year 6 line conditionally. If it's not Year 6, this remains completely empty.
+            const y6Line = cushion.isHoverDateInYear6
+                ? `📅 ${t('citizenshipFinalYearShort')}: <strong>${cushion.citizenY6Cushion} ${t('days')}</strong><br>`
+                : ``;
+
+            const disqualifiedLine = cushion.isPreviousDisqualifiedPeriod
+                ? `<span style="color:#fca5a5; font-weight:700;">${t('disqualifiedPeriod')}</span><br>`
+                : ``;
+
+            const tooltipHTML = `
+                <div class="tooltip" style="white-space: nowrap;">
+                    <strong>${dateStr} ${isToday ? `(${t("today")})` : ""}</strong><br>
+                    ${disqualifiedLine}
+                    <span style="color:#94a3b8;">${statusLabelText}</span>${milestoneCountdownText}
+                    <hr style="border-color:#334155; margin:6px 0;">
+                    🛡️ ${t('totalSafeCushion').replace('🛡️ ', '')}: <span style="color:${cushion.overallCushion > 30 ? '#22c55e' : '#f97316'}; font-weight:bold;">${cushion.overallCushion} ${t('days')}</span><br>
+                    ⏳ ${t('ilrRolling12MonthShort')}: <strong>${cushion.rollingCushion} ${t('days')}</strong><br>
+                    🌍 ${t('citizenship5YrAccumShort')}: <strong>${cushion.citizenTotalCushion} ${t('days')}</strong><br>
+                    ${y6Line}
+                    <span style="color:#94a3b8;">${t('rollingAbsences', { days: rollingCount })}</span>
+                </div>
+            `;
+
+            grid.innerHTML += `<div class="cal-cell ${extraClass}">${day}${tooltipHTML}</div>`;
+        }
+    }
+
+    function renderDOM(rollingBreachDetected, worstRollingPeriod) {
+        const container = document.getElementById('timelineContainer');
+        container.innerHTML = '';
+
+        (displayedTimelineYears.length ? displayedTimelineYears : visaYears).forEach(y => {
+            if (y.marker) {
+                container.innerHTML += `<div class="renewal-marker">${t('renewedStartDate', { date: formatDateForDisplay(y.start, { year: 'numeric', month: 'long', day: 'numeric' }) })}</div>`;
+                return;
+            }
+
+            let statusClass = 'safe';
+            let maxLimit = y.yearNum === 6 ? 90 : 180;
+            if (y.absences > maxLimit) statusClass = 'danger';
+            else if (y.absences > (maxLimit * 0.8)) statusClass = 'warning';
+
+            const cardClass = y.displayType === 'disqualified' ? 'disqualified' : (y.renewed ? `${statusClass} renewed` : statusClass);
+            const label = y.displayType === 'disqualified'
+                ? `${t('disqualifiedPeriod')} ${y.yearNum}`
+                : (y.renewed ? t('renewedYear', { year: y.yearNum }) : t('year', { year: y.yearNum }));
+            const badgeText = y.displayType === 'disqualified'
+                ? t('disqualifiedBadge')
+                : (y.renewed ? `${t('renewedBadge')} · ${y.absences > maxLimit ? t('breached') : t('ok')}` : `${y.absences > maxLimit ? t('breached') : t('ok')}`);
+
+            container.innerHTML += `
+                <div class="year-card ${cardClass}">
+                    <div class="year-label">${label}</div>
+                    <div class="year-dates">${formatDateLocal(y.start)} to ${formatDateLocal(y.end)}</div>
+                    <div class="year-days">${y.absences} ${t('daysTitle')}</div>
+                    <span class="badge ${statusClass}">${badgeText}</span>
+                </div>
+            `;
+        });
+
+        const total5YearAbsences = visaYears
+            .filter(y => y.yearNum >= 2 && y.yearNum <= 6)
+            .reduce((sum, y) => sum + y.absences, 0);
+
+        const y6Absences = visaYears[5].absences;
+
+        // Keep the dashboard cards aligned with the calendar hover for TODAY.
+        // The previous version showed the worst rolling window across the whole
+        // qualifying period, while the calendar hover showed the rolling position
+        // as of the hovered date. That made today's hover disagree with the cards.
+        const todayCushion = getCushionBreakdownForDate(formatDateLocal(TODAY_ANCHOR));
+        const cushionRollingValue = todayCushion.rollingCushion;
+        const cushionCitizenTotalValue = todayCushion.citizenTotalCushion;
+        const cushionCitizenY6Value = todayCushion.citizenY6Cushion;
+        const isCurrentlyInYear6 = todayCushion.isHoverDateInYear6;
+        const overallCushionValue = todayCushion.overallCushion;
+
+        document.getElementById('cushionRolling').innerText = `${cushionRollingValue} ${t('daysTitle')}`;
+        document.getElementById('cushionCitizenTotal').innerText = `${cushionCitizenTotalValue} ${t('daysTitle')}`;
+
+        if (isCurrentlyInYear6) {
+            document.getElementById('cushionCitizenY6').innerText = `${cushionCitizenY6Value} ${t('daysTitle')}`;
+        } else {
+            document.getElementById('cushionCitizenY6').innerText = t("notActiveYet");
+        }
+
+        document.getElementById('cushionOverall').innerText = `${overallCushionValue} ${t('daysTitle')}`;
+
+        const overallCard = document.querySelector('.cushion-card.overall');
+        if(overallCushionValue === 0) {
+            overallCard.style.background = "#fef2f2";
+            overallCard.style.borderColor = "#fca5a5";
+        } else if(overallCushionValue < 20) {
+            overallCard.style.background = "#fffbeb";
+            overallCard.style.borderColor = "#fde68a";
+        } else {
+            overallCard.style.background = "#f0fdf4";
+            overallCard.style.borderColor = "#bbf7d0";
+        }
+
+        const statusMsgText = document.getElementById('citizenshipStatusText');
+        if (rollingBreachDetected) {
+            statusMsgText.innerHTML = t('ilrRollingBreach', { days: worstRollingPeriod });
+            statusMsgText.style.background = "#fef2f2"; statusMsgText.style.color = "var(--danger)";
+        } else if (total5YearAbsences > 450) {
+            statusMsgText.innerHTML = t('citizenshipCumulativeBreach', { days: total5YearAbsences });
+            statusMsgText.style.background = "#fef2f2"; statusMsgText.style.color = "var(--danger)";
+        } else if (TODAY_ANCHOR >= visaYears[5].start && y6Absences > 90) {
+            statusMsgText.innerHTML = t('citizenshipFinalYearBreach', { days: y6Absences });
+            statusMsgText.style.background = "#fef2f2"; statusMsgText.style.color = "var(--danger)";
+        } else if (renewalInfo) {
+            statusMsgText.innerHTML = t('renewedStatus', { days: overallCushionValue, date: formatDateForDisplay(renewalInfo.start, { year: 'numeric', month: 'long', day: 'numeric' }) });
+            statusMsgText.style.background = "#fffbeb"; statusMsgText.style.color = "#92400e";
+        } else {
+            statusMsgText.innerHTML = t('compliantSafe', { days: overallCushionValue });
+            statusMsgText.style.background = "#f0fdf4"; statusMsgText.style.color = "var(--success)";
+        }
+
+        const tbody = document.getElementById('tripTableBody');
+        tbody.innerHTML = '';
+
+        if (initialEntryDelayDays > 0) {
+            tbody.innerHTML += `
+                <tr style="background: #f8fafc; font-style: italic; color: #64748b;">
+                    <td><strong>${t('initialEntryDelayAutomatic')}</strong></td>
+                    <td>${document.getElementById('visaStart').value}</td>
+                    <td>${formatDateLocal(addDays(parseLocalDate(document.getElementById('entryDate').value), -1))}</td>
+                    <td>${initialEntryDelayDays} ${t('days')}</td>
+                    <td><span style="font-size:0.8rem; color:#94a3b8;">${t('systemLock')}</span></td>
+                </tr>
+            `;
+        }
+
+        if(trips.length === 0 && initialEntryDelayDays === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">${t("noItems")}</td></tr>`;
+        }
+
+        trips.forEach(trip => {
+            const days = calculateWholeDays(trip.out, trip.in);
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${trip.destination}</strong></td>
+                    <td>${trip.out}</td>
+                    <td>${trip.in}</td>
+                    <td>${days} ${t('days')}</td>
+                    <td><button class="delete-btn" onclick="deleteTrip(${trip.id})">${t('delete')}</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function addTrip(e) {
+        e.preventDefault();
+        const destination = document.getElementById('destination').value;
+        const out = document.getElementById('dateOut').value;
+        const inDate = document.getElementById('dateIn').value;
+
+        if (parseLocalDate(out) > parseLocalDate(inDate)) {
+            alert(t("returnBeforeDeparture"));
+            return;
+        }
+
+        trips.push({ id: nextId++, destination, out, in: inDate });
+        document.getElementById('tripForm').reset();
+        document.getElementById('dateOut').value = formatDateLocal(TODAY_ANCHOR);
+        document.getElementById('dateIn').value = formatDateLocal(TODAY_ANCHOR);
+
+        saveTripsToStorage();
+        processAbsences();
+    }
+
+    function deleteTrip(id) {
+        trips = trips.filter(t => t.id !== id);
+        saveTripsToStorage();
+        processAbsences();
+    }
+
+    function getTrackerConfig() {
+        const calendarView = getCurrentCalendarView();
+        return {
+            app: "UK BN(O) Visa Tracker & Compliance Suite",
+            schemaVersion: 1,
+            exportedAt: new Date().toISOString(),
+            timezone: APP_TIMEZONE,
+            londonDate: getLondonTodayString(),
+            visaStart: document.getElementById('visaStart').value,
+            entryDate: document.getElementById('entryDate').value,
+            ilrGrantDate: (document.getElementById("ilrGrantDate") ? document.getElementById("ilrGrantDate").value : ""),
+            trips: trips.map(trip => ({
+                id: trip.id,
+                destination: trip.destination,
+                out: trip.out,
+                in: trip.in
+            })),
+            nextId,
+            calendarView
+        };
+    }
+
+
+    function isValidDateString(value) {
+        return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(parseLocalDate(value).getTime());
+    }
+
+    function normalizeImportedTrips(importedTrips) {
+        if (!Array.isArray(importedTrips)) return [];
+
+        return importedTrips
+            .filter(trip => trip && isValidDateString(trip.out) && isValidDateString(trip.in))
+            .map((trip, index) => ({
+                id: Number.isInteger(trip.id) ? trip.id : index + 1,
+                destination: String(trip.destination || t('importedTrip')).trim() || t('importedTrip'),
+                out: trip.out,
+                in: trip.in
+            }));
+    }
+
+    function applyTrackerConfig(config) {
+        if (!config || typeof config !== 'object') {
+            throw new Error(t('configMustObject'));
+        }
+        if (!isValidDateString(config.visaStart) || !isValidDateString(config.entryDate)) {
+            throw new Error(t('configMustDates'));
+        }
+
+        document.getElementById('visaStart').value = config.visaStart;
+        document.getElementById('entryDate').value = config.entryDate;
+        trips = normalizeImportedTrips(config.trips);
+        nextId = Number.isInteger(config.nextId)
+            ? config.nextId
+            : (trips.reduce((max, trip) => Math.max(max, trip.id), 0) + 1);
+
+        if (config.calendarView && Number.isInteger(config.calendarView.month) && Number.isInteger(config.calendarView.year)) {
+            setCalendarView(config.calendarView.month, config.calendarView.year, false);
+        }
+
+        localStorage.setItem('bno_visaStart', config.visaStart);
+        localStorage.setItem('bno_entryDate', config.entryDate);
+        saveTripsToStorage();
+        saveCalendarViewState();
+        updateTimeline();
+    }
+
+
+    function importConfigFromFile(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(loadEvent) {
+            try {
+                const config = JSON.parse(loadEvent.target.result);
+                applyTrackerConfig(config);
+                alert(t("importSuccess"));
+            } catch (error) {
+                alert(`${t("importFailed")}: ${error.message}`);
+            } finally {
+                event.target.value = '';
+            }
+        };
+        reader.onerror = function() {
+            alert(`${t("importFailed")}: ${t('couldNotReadFile')}`);
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    function buildConfigSnapshot() {
+        return {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            timezone: APP_TIMEZONE,
+            londonDate: getLondonTodayString(),
+            visaStart: document.getElementById('visaStart').value,
+            entryDate: document.getElementById('entryDate').value,
+            shownCalendarMonth: parseInt(document.getElementById('calMonth').value),
+            shownCalendarYear: parseInt(document.getElementById('calYear').value),
+            trips: trips,
+            nextId: nextId
+        };
+    }
+
+    function downloadConfigJson() {
+        const config = getTrackerConfig();
+        const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const dateStamp = formatDateLocal(TODAY_ANCHOR);
+        link.href = url;
+        link.download = `bno-visa-tracker-backup-${dateStamp}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function importConfigJson(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const config = JSON.parse(e.target.result);
+
+                if (!config || !Array.isArray(config.trips)) {
+                    throw new Error(t("invalidBackup"));
+                }
+
+                document.getElementById('visaStart').value = config.visaStart || "2021-06-01";
+                document.getElementById('entryDate').value = config.entryDate || "2021-06-15";
+                trips = config.trips;
+                nextId = parseInt(config.nextId) || (trips.reduce((max, trip) => Math.max(max, trip.id || 0), 0) + 1);
+
+                localStorage.setItem('bno_visaStart', document.getElementById('visaStart').value);
+                localStorage.setItem('bno_entryDate', document.getElementById('entryDate').value);
+                saveTripsToStorage();
+
+                updateTimeline();
+
+                if (Number.isInteger(config.shownCalendarMonth) && Number.isInteger(config.shownCalendarYear)) {
+                    document.getElementById('calMonth').value = config.shownCalendarMonth;
+                    document.getElementById('calYear').value = config.shownCalendarYear;
+                    saveCalendarState();
+                    renderCalendarView();
+                }
+
+                alert(t("importSuccess"));
+            } catch (err) {
+                alert(`${t("importFailed")}: ${err.message}`);
+            } finally {
+                event.target.value = "";
+            }
+        };
+        reader.readAsText(file);
+    }
+
+</script>
+</body>
+</html>
