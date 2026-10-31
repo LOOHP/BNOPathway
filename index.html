@@ -122,6 +122,22 @@
         .cushion-card.overall .cushion-title { color: #166534; }
         .cushion-value { font-size: 1.6rem; font-weight: 800; margin: 5px 0; color: #1e293b; }
         .cushion-meta { font-size: 0.75rem; color: #64748b; }
+        .cushion-header {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .cushion-header h2 {
+            border-bottom: 2px solid #e2e8f0;
+            margin: 0;
+            padding: 0 0 8px;
+        }
+        .cushion-date-controls { display: flex; align-items: flex-end; justify-content: flex-start; gap: 8px; }
+        .cushion-date-field label { display: block; margin-bottom: 4px; font-size: 0.75rem; }
+        .cushion-date-field input { width: auto; min-width: 150px; }
+        .cushion-date-controls .today-btn { white-space: nowrap; }
 
         /* --- APPLICATION TIMELINE DATES --- */
         .dates-box {
@@ -483,6 +499,16 @@
                 margin-top: 8px;
             }
 
+            .cushion-header,
+            .cushion-date-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .cushion-date-field input {
+                width: 100%;
+            }
+
             .card > div[style*="display: flex"][style*="justify-content: space-between"] {
                 flex-direction: column;
                 align-items: stretch !important;
@@ -737,7 +763,16 @@
             </div>
 
             <div class="card">
-                <h2 data-i18n="cushionTitle">Safety Cushion Breakdown</h2>
+                <div class="cushion-header">
+                    <h2 data-i18n="cushionTitle">Safety Cushion Breakdown</h2>
+                    <div class="cushion-date-controls">
+                        <div class="cushion-date-field">
+                            <label for="cushionDate" data-i18n="breakdownDate">Breakdown Date</label>
+                            <input type="date" id="cushionDate" onchange="updateCushionDate()">
+                        </div>
+                        <button type="button" class="today-btn" onclick="resetCushionDateToToday()" data-i18n="resetToToday">📅 Reset to Today</button>
+                    </div>
+                </div>
                 <div class="cushion-grid">
                     <div class="cushion-card overall">
                         <div>
@@ -858,6 +893,8 @@
             downloadBackup: "Download JSON Backup",
             importFromFile: "Import From File",
             cushionTitle: "Safety Cushion Breakdown",
+            breakdownDate: "Breakdown Date",
+            resetToToday: "📅 Reset to Today",
             calendarTitle: "Interactive Travel Calendar",
             jumpToday: "📅 Jump to Today",
             historyTitle: "Tracked History Matrix",
@@ -971,6 +1008,8 @@
             downloadBackup: "下載 JSON 備份",
             importFromFile: "匯入備份檔",
             cushionTitle: "尚可離境日數分析",
+            breakdownDate: "分析日期",
+            resetToToday: "📅 重設為今日",
             calendarTitle: "出入境日曆",
             jumpToday: "📅 跳至今日",
             historyTitle: "行程記錄",
@@ -1190,6 +1229,7 @@
         document.getElementById('dateIn').value = formatDateLocal(TODAY_ANCHOR);
 
         loadSavedData();
+        restoreCushionDateState();
         populateCalendarSelectors();
         restoreCalendarViewState();
         updateTimeline();
@@ -1248,6 +1288,30 @@
             localStorage.setItem('bno_calendar_month', view.month);
             localStorage.setItem('bno_calendar_year', view.year);
         }
+    }
+
+    function getSelectedCushionDateString() {
+        const picker = document.getElementById('cushionDate');
+        return picker && isValidDateString(picker.value)
+            ? picker.value
+            : formatDateLocal(TODAY_ANCHOR);
+    }
+
+    function restoreCushionDateState() {
+        const storedDate = localStorage.getItem('bno_cushion_date');
+        document.getElementById('cushionDate').value = isValidDateString(storedDate)
+            ? storedDate
+            : formatDateLocal(TODAY_ANCHOR);
+    }
+
+    function updateCushionDate() {
+        localStorage.setItem('bno_cushion_date', getSelectedCushionDateString());
+        updateTimeline();
+    }
+
+    function resetCushionDateToToday() {
+        document.getElementById('cushionDate').value = formatDateLocal(TODAY_ANCHOR);
+        updateCushionDate();
     }
 
     function ensureCalendarYearOption(year) {
@@ -1334,6 +1398,7 @@
             document.getElementById('entryDate').value = "2021-06-15";
             const ilrGrantInput = document.getElementById('ilrGrantDate');
             if (ilrGrantInput) ilrGrantInput.value = "";
+            document.getElementById('cushionDate').value = formatDateLocal(TODAY_ANCHOR);
             trips = [];
             nextId = 1;
             saveTimelineSettings();
@@ -1638,7 +1703,7 @@
         }
 
         calculateApplicationDates(vStart, activeQualifyingStartDate);
-        renderDOM(rollingResult.rollingBreachDetected, rollingResult.worstRollingPeriod);
+        renderDOM();
         renderCalendarView();
     }
 
@@ -1704,7 +1769,9 @@
         return {
             rollingCount,
             rollingCushion,
+            citizenTotalAbsences: absencesUpToHover,
             citizenTotalCushion,
+            citizenY6Absences: y6AbsencesUpToHover,
             citizenY6Cushion,
             overallCushion,
             isHoverDateInYear6,
@@ -1803,7 +1870,7 @@
         }
     }
 
-    function renderDOM(rollingBreachDetected, worstRollingPeriod) {
+    function renderDOM() {
         const container = document.getElementById('timelineContainer');
         container.innerHTML = '';
 
@@ -1836,27 +1903,20 @@
             `;
         });
 
-        const total5YearAbsences = visaYears
-            .filter(y => y.yearNum >= 2 && y.yearNum <= 6)
-            .reduce((sum, y) => sum + y.absences, 0);
-
-        const y6Absences = visaYears[5].absences;
-
-        // Keep the dashboard cards aligned with the calendar hover for TODAY.
-        // The previous version showed the worst rolling window across the whole
-        // qualifying period, while the calendar hover showed the rolling position
-        // as of the hovered date. That made today's hover disagree with the cards.
-        const todayCushion = getCushionBreakdownForDate(formatDateLocal(TODAY_ANCHOR));
-        const cushionRollingValue = todayCushion.rollingCushion;
-        const cushionCitizenTotalValue = todayCushion.citizenTotalCushion;
-        const cushionCitizenY6Value = todayCushion.citizenY6Cushion;
-        const isCurrentlyInYear6 = todayCushion.isHoverDateInYear6;
-        const overallCushionValue = todayCushion.overallCushion;
+        // Keep the cards and status banner aligned with the selected breakdown date.
+        // The same calculation powers the calendar hover audit.
+        const selectedCushionDate = getSelectedCushionDateString();
+        const selectedCushion = getCushionBreakdownForDate(selectedCushionDate);
+        const cushionRollingValue = selectedCushion.rollingCushion;
+        const cushionCitizenTotalValue = selectedCushion.citizenTotalCushion;
+        const cushionCitizenY6Value = selectedCushion.citizenY6Cushion;
+        const isSelectedDateInYear6 = selectedCushion.isHoverDateInYear6;
+        const overallCushionValue = selectedCushion.overallCushion;
 
         document.getElementById('cushionRolling').innerText = `${cushionRollingValue} ${t('daysTitle')}`;
         document.getElementById('cushionCitizenTotal').innerText = `${cushionCitizenTotalValue} ${t('daysTitle')}`;
 
-        if (isCurrentlyInYear6) {
+        if (isSelectedDateInYear6) {
             document.getElementById('cushionCitizenY6').innerText = `${cushionCitizenY6Value} ${t('daysTitle')}`;
         } else {
             document.getElementById('cushionCitizenY6').innerText = t("notActiveYet");
@@ -1877,16 +1937,16 @@
         }
 
         const statusMsgText = document.getElementById('citizenshipStatusText');
-        if (rollingBreachDetected) {
-            statusMsgText.innerHTML = t('ilrRollingBreach', { days: worstRollingPeriod });
+        if (selectedCushion.rollingCount > 180) {
+            statusMsgText.innerHTML = t('ilrRollingBreach', { days: selectedCushion.rollingCount });
             statusMsgText.style.background = "#fef2f2"; statusMsgText.style.color = "var(--danger)";
-        } else if (total5YearAbsences > 450) {
-            statusMsgText.innerHTML = t('citizenshipCumulativeBreach', { days: total5YearAbsences });
+        } else if (selectedCushion.citizenTotalAbsences > 450) {
+            statusMsgText.innerHTML = t('citizenshipCumulativeBreach', { days: selectedCushion.citizenTotalAbsences });
             statusMsgText.style.background = "#fef2f2"; statusMsgText.style.color = "var(--danger)";
-        } else if (TODAY_ANCHOR >= visaYears[5].start && y6Absences > 90) {
-            statusMsgText.innerHTML = t('citizenshipFinalYearBreach', { days: y6Absences });
+        } else if (isSelectedDateInYear6 && selectedCushion.citizenY6Absences > 90) {
+            statusMsgText.innerHTML = t('citizenshipFinalYearBreach', { days: selectedCushion.citizenY6Absences });
             statusMsgText.style.background = "#fef2f2"; statusMsgText.style.color = "var(--danger)";
-        } else if (renewalInfo) {
+        } else if (renewalInfo && parseLocalDate(selectedCushionDate) >= renewalInfo.start) {
             statusMsgText.innerHTML = t('renewedStatus', { days: overallCushionValue, date: formatDateForDisplay(renewalInfo.start, { year: 'numeric', month: 'long', day: 'numeric' }) });
             statusMsgText.style.background = "#fffbeb"; statusMsgText.style.color = "#92400e";
         } else {
@@ -1977,6 +2037,7 @@
                 in: trip.in
             })),
             nextId,
+            cushionDate: getSelectedCushionDateString(),
             calendarView
         };
     }
@@ -2017,9 +2078,13 @@
         if (config.calendarView && Number.isInteger(config.calendarView.month) && Number.isInteger(config.calendarView.year)) {
             setCalendarView(config.calendarView.month, config.calendarView.year, false);
         }
+        if (isValidDateString(config.cushionDate)) {
+            document.getElementById('cushionDate').value = config.cushionDate;
+        }
 
         localStorage.setItem('bno_visaStart', config.visaStart);
         localStorage.setItem('bno_entryDate', config.entryDate);
+        localStorage.setItem('bno_cushion_date', getSelectedCushionDateString());
         saveTripsToStorage();
         saveCalendarViewState();
         updateTimeline();
@@ -2059,6 +2124,7 @@
             entryDate: document.getElementById('entryDate').value,
             shownCalendarMonth: parseInt(document.getElementById('calMonth').value),
             shownCalendarYear: parseInt(document.getElementById('calYear').value),
+            cushionDate: getSelectedCushionDateString(),
             trips: trips,
             nextId: nextId
         };
@@ -2093,11 +2159,15 @@
 
                 document.getElementById('visaStart').value = config.visaStart || "2021-06-01";
                 document.getElementById('entryDate').value = config.entryDate || "2021-06-15";
+                if (isValidDateString(config.cushionDate)) {
+                    document.getElementById('cushionDate').value = config.cushionDate;
+                }
                 trips = config.trips;
                 nextId = parseInt(config.nextId) || (trips.reduce((max, trip) => Math.max(max, trip.id || 0), 0) + 1);
 
                 localStorage.setItem('bno_visaStart', document.getElementById('visaStart').value);
                 localStorage.setItem('bno_entryDate', document.getElementById('entryDate').value);
+                localStorage.setItem('bno_cushion_date', getSelectedCushionDateString());
                 saveTripsToStorage();
 
                 updateTimeline();
