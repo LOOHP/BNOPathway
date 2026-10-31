@@ -1913,7 +1913,13 @@
             tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">${t("noItems")}</td></tr>`;
         }
 
-        trips.forEach(trip => {
+        const tripsByDate = [...trips].sort((a, b) =>
+            a.out.localeCompare(b.out) ||
+            a.in.localeCompare(b.in) ||
+            a.id - b.id
+        );
+
+        tripsByDate.forEach(trip => {
             const days = calculateWholeDays(trip.out, trip.in);
             tbody.innerHTML += `
                 <tr>
