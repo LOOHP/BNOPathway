@@ -31,7 +31,33 @@
             background-color: var(--background);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 8px 20px 20px;
+        }
+
+        .top-bar {
+            max-width: 1200px;
+            margin: 0 auto 24px;
+            padding: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .top-bar a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 6px 8px;
+            border-radius: 6px;
+        }
+
+        .top-bar a:hover {
+            text-decoration: underline;
+        }
+
+        .top-bar-logo {
+            display: block;
+            width: 28px;
+            height: 28px;
         }
 
         .container { max-width: 1200px; margin: 0 auto; }
@@ -129,11 +155,14 @@
             gap: 12px;
             margin-bottom: 15px;
         }
-        .cushion-header h2 {
+        .cushion-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             border-bottom: 2px solid #e2e8f0;
-            margin: 0;
-            padding: 0 0 8px;
+            padding-bottom: 8px;
         }
+        .cushion-title-row h2 { border: none; margin: 0; padding: 0; }
         .cushion-date-controls { display: flex; align-items: flex-end; justify-content: flex-start; gap: 8px; }
         .cushion-date-field label { display: block; margin-bottom: 4px; font-size: 0.75rem; }
         .cushion-date-field input { width: auto; min-width: 150px; }
@@ -414,8 +443,19 @@
 
         @media (max-width: 640px) {
             body {
-                padding: 10px;
+                padding: 6px 10px 10px;
                 overflow-x: hidden;
+            }
+
+            .top-bar {
+                width: 100%;
+                margin-bottom: 16px;
+                padding: 0 6px;
+            }
+
+            .top-bar a {
+                font-size: 0.9rem;
+                padding: 6px;
             }
 
             .container {
@@ -503,6 +543,12 @@
             .cushion-date-controls {
                 flex-direction: column;
                 align-items: stretch;
+            }
+
+            .cushion-title-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
             }
 
             .cushion-date-field input {
@@ -662,6 +708,13 @@
 </head>
 <body>
 
+<nav class="top-bar" aria-label="External links">
+    <a href="https://loohpjames.com" target="_blank" rel="noopener noreferrer" aria-label="LoohpJames home">
+        <img class="top-bar-logo" src="https://loohpjames.com/assets/images/profile_rounded.png" width="28" height="28" alt="LoohpJames">
+    </a>
+    <a href="https://github.com/LOOHP/BNOPathway" target="_blank" rel="noopener noreferrer">GitHub</a>
+</nav>
+
 <div class="container">
     <header>
         <h1 data-i18n="appTitle">UK BN(O) Visa Tracker & Compliance Suite</h1>
@@ -764,13 +817,15 @@
 
             <div class="card">
                 <div class="cushion-header">
-                    <h2 data-i18n="cushionTitle">Safety Cushion Breakdown</h2>
+                    <div class="cushion-title-row">
+                        <h2 data-i18n="cushionTitle">Safety Cushion Breakdown</h2>
+                        <button type="button" class="today-btn" onclick="resetCushionDateToToday()" data-i18n="resetToToday">📅 Reset to Today</button>
+                    </div>
                     <div class="cushion-date-controls">
                         <div class="cushion-date-field">
                             <label for="cushionDate" data-i18n="breakdownDate">Breakdown Date</label>
                             <input type="date" id="cushionDate" onchange="updateCushionDate()">
                         </div>
-                        <button type="button" class="today-btn" onclick="resetCushionDateToToday()" data-i18n="resetToToday">📅 Reset to Today</button>
                     </div>
                 </div>
                 <div class="cushion-grid">
