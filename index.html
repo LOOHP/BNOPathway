@@ -1120,7 +1120,7 @@
                             <div class="cushion-value" id="cushionRolling">0 Days</div>
                         </div>
                         <div class="cushion-meta" data-i18n="cushionVs180">Cushion vs 180-day limit.</div>
-                        <div class="rule-note" data-i18n-html="rollingCushionRule"><strong>How calculated:</strong> 180 minus the highest absence count found in any rolling 365-day window during the ILR qualifying period.</div>
+                        <div class="rule-note" data-i18n-html="rollingCushionRule"><strong>How calculated:</strong> 180 minus the highest absence count found in any rolling 12-calendar-month window during the ILR qualifying period.</div>
                     </div>
                     <div class="cushion-card">
                         <div>
@@ -1274,7 +1274,7 @@
             overallCushionRule: "<strong>How calculated:</strong> the lowest active remaining allowance across the applicable ILR and citizenship absence rules.",
             ilrRollingRule: "⏳ ILR Rolling 12-Month Rule Remaining Days",
             cushionVs180: "Cushion vs 180-day limit.",
-            rollingCushionRule: "<strong>How calculated:</strong> 180 minus the highest absence count found in any rolling 365-day window during the ILR qualifying period.",
+            rollingCushionRule: "<strong>How calculated:</strong> 180 minus the highest absence count found in any rolling 12-calendar-month window during the ILR qualifying period.",
             citizenship5YearAccumulation: "🌍 Citizenship 5-Yr Accumulation Remaining Days",
             cushionVs450: "Cushion vs 450-day Y2-Y6 limit.",
             citizenTotalRule: "<strong>How calculated:</strong> 450 minus total counted absent days across the citizenship qualifying period used here, Years 2–6.",
@@ -1418,7 +1418,7 @@
             overallCushionRule: "<strong>計算方法：</strong>在適用的永久居留及入籍離境規則中，取最低的剩餘可用日數。",
             ilrRollingRule: "⏳ 尚餘永久居留 12 個月滾動限制日數",
             cushionVs180: "距離 180 日上限尚餘的日數。",
-            rollingCushionRule: "<strong>計算方法：</strong>180 減去永久居留合資格期間內，任何滾動 365 日期間錄得的最高離境日數。",
+            rollingCushionRule: "<strong>計算方法：</strong>180 減去永久居留合資格期間內，任何滾動 12 個月期間錄得的最高離境日數。",
             citizenship5YearAccumulation: "🌍 尚餘入籍 5 年累計離境日數",
             cushionVs450: "距離第 2 至第 6 年 450 日上限尚餘的日數。",
             citizenTotalRule: "<strong>計算方法：</strong>450 減去此工具採用的入籍合資格期間（第 2 至第 6 年）累計離境日數。",
@@ -1994,12 +1994,12 @@
 
         while (loopDate <= totalTimelineEnd) {
             let rollingAbsences = 0;
-            for (let i = 0; i < 365; i++) {
-                let checkDate = new Date(loopDate);
-                checkDate.setDate(loopDate.getDate() - i);
-                if (checkDate < totalTimelineStart) break;
+            let checkDate = getRollingTwelveMonthStart(loopDate);
+            if (checkDate < totalTimelineStart) checkDate = new Date(totalTimelineStart);
+            while (checkDate <= loopDate) {
                 let dateKey = formatDateLocal(checkDate);
                 if (globalAbsenceMap[dateKey] && globalAbsenceMap[dateKey].type === 'absent') rollingAbsences++;
+                checkDate.setDate(checkDate.getDate() + 1);
             }
             targetMap[formatDateLocal(loopDate)] = rollingAbsences;
             if (loopDate <= ilrEnd) {
@@ -2025,6 +2025,12 @@
         return result;
     }
 
+    function getRollingTwelveMonthStart(endDate) {
+        const startDate = addDays(endDate, 1);
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        return startDate;
+    }
+
     function daysBetweenInclusive(startDate, endDate) {
         return calendarDayDiff(startDate, endDate) + 1;
     }
@@ -2042,7 +2048,8 @@
         }
 
         for (let endOffset = 0; endOffset < totalDays; endOffset++) {
-            const startOffset = Math.max(0, endOffset - 364);
+            const endDate = addDays(candidateStart, endOffset);
+            const startOffset = Math.max(0, calendarDayDiff(candidateStart, getRollingTwelveMonthStart(endDate)));
             const rollingAbsences = prefixAbsences[endOffset + 1] - prefixAbsences[startOffset];
             if (rollingAbsences > 180) return true;
         }
@@ -2451,7 +2458,7 @@
                 const count = rollingMap[dateStr] || 0;
                 if (count > 180) {
                     rollingFailures.push({
-                        start: addDays(date, -364),
+                        start: getRollingTwelveMonthStart(date),
                         end: new Date(date),
                         count,
                         endStr: dateStr
@@ -2685,9 +2692,7 @@
         if (!timelineView || !timelineView.dayData.length) return;
         const endIndex = timelineView.selectionEnd;
         const selectedEnd = timelineView.dayData[endIndex].date;
-        const twelveMonthStart = new Date(selectedEnd);
-        twelveMonthStart.setFullYear(twelveMonthStart.getFullYear() - 1);
-        twelveMonthStart.setDate(twelveMonthStart.getDate() + 1);
+        const twelveMonthStart = getRollingTwelveMonthStart(selectedEnd);
         const startIndex = Math.max(
             timelineView.minSelectionIndex,
             calendarDayDiff(timelineView.bounds.start, twelveMonthStart)
