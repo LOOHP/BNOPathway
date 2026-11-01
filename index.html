@@ -192,29 +192,261 @@
         .date-card .target-date { font-size: 1.35rem; font-weight: 800; margin: 8px 0; color: #1e293b; }
         .date-card .countdown { font-size: 0.85rem; font-weight: 600; color: #475569; }
 
-        /* --- YEAR TIMELINE MATRIX --- */
-        .timeline {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-        .year-card {
-            background: #f1f5f9;
-            padding: 12px;
+        /* --- INTERACTIVE ABSENCE TIMELINE --- */
+        .timeline-summary {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
-            text-align: center;
-            border-top: 4px solid #cbd5e1;
+            padding: 11px 13px;
+            margin-bottom: 12px;
+            color: #334155;
+            font-size: 0.85rem;
+            line-height: 1.5;
         }
-        .year-card.safe { border-top-color: var(--success); }
-        .year-card.warning { border-top-color: var(--warning); }
-        .year-card.danger { border-top-color: var(--danger); }
-        .year-card.disqualified { opacity: 0.72; background: #f8fafc; border-top-color: #64748b; }
-        .year-card.renewed { box-shadow: 0 0 0 2px #1e3a8a inset; }
-        .renewal-marker { grid-column: 1 / -1; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; padding:12px 14px; border-radius:8px; font-weight:700; text-align:center; }
-        .year-days { font-size: 1.4rem; font-weight: bold; margin: 5px 0; }
-        .year-label { font-size: 0.85rem; font-weight: 600; }
-        .year-dates { font-size: 0.7rem; color: #64748b; }
+        .timeline-summary .timeline-detail-heading { color: var(--primary); }
+        .timeline-summary .timeline-detail-divider { border-top-color: #e2e8f0; }
+        .timeline-summary .timeline-detail-grid strong { color: #1e293b; }
+        .timeline-range-actions {
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: -4px 0 12px;
+        }
+        .timeline-range-btn {
+            width: auto;
+            margin: 0;
+            padding: 7px 12px;
+            background: #475569;
+            font-size: 0.8rem;
+        }
+        .timeline-range-btn:hover { background: #334155; }
+        .timeline-detail-heading {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .timeline-selected-dates {
+            display: inline-block;
+            margin-left: 0.25em;
+            white-space: nowrap;
+        }
+        .timeline-detail-divider {
+            border: 0;
+            border-top: 1px solid #334155;
+            margin: 7px 0;
+        }
+        .timeline-detail-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+        }
+        .timeline-tooltip .timeline-detail-grid strong { color: #bfdbfe; }
+        .timeline-detail-line { margin-top: 3px; }
+        .timeline-detail-safe { color: #86efac; }
+        .timeline-detail-danger { color: #fca5a5; }
+        .timeline-detail-muted { color: #cbd5e1; }
+        .timeline-zoom-control {
+            margin-bottom: 12px;
+        }
+        .timeline-zoom-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #475569;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .timeline-zoom-control input[type="range"] {
+            width: 100%;
+            padding: 0;
+            border: 0;
+            accent-color: var(--primary);
+        }
+        .absence-timeline-viewport {
+            width: 100%;
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+        .absence-timeline-plot {
+            position: relative;
+            height: 250px;
+            min-width: 100%;
+            user-select: none;
+            touch-action: pan-x pan-y;
+        }
+        .timeline-lane-label {
+            position: absolute;
+            left: 0;
+            color: #475569;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+        .timeline-lane-label.presence { top: 51px; }
+        .timeline-lane-label.compliance { top: 119px; }
+        .absence-timeline-track {
+            position: absolute;
+            left: 0;
+            right: 0;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+        .absence-timeline-track.presence {
+            top: 68px;
+            height: 44px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            box-sizing: border-box;
+        }
+        .absence-timeline-track.compliance {
+            top: 136px;
+            height: 10px;
+            background: #16a34a;
+            border-radius: 3px;
+        }
+        .timeline-segment {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+        }
+        .timeline-segment.pre-visa { background: #e2e8f0; }
+        .timeline-segment.inside { background: #ffffff; }
+        .timeline-segment.outside { background: var(--absent-day); }
+        .timeline-segment.travel { background: #fef08a; }
+        .timeline-segment.compliant { background: #16a34a; }
+        .timeline-segment.breach { background: #ef4444; }
+        .timeline-marker {
+            position: absolute;
+            top: 68px;
+            height: 78px;
+            width: 14px;
+            transform: translateX(-50%);
+            z-index: 7;
+        }
+        .timeline-marker::before,
+        .timeline-marker::after {
+            content: "";
+            position: absolute;
+            left: 6px;
+            width: 2px;
+            background: #2563eb;
+        }
+        .timeline-marker::before {
+            top: 0;
+            height: 44px;
+        }
+        .timeline-marker::after {
+            top: 68px;
+            height: 10px;
+        }
+        .timeline-marker-label {
+            display: none;
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% + 6px);
+            max-width: 190px;
+            padding: 5px 7px;
+            border-radius: 5px;
+            background: #0f172a;
+            color: #ffffff;
+            white-space: nowrap;
+            font-size: 0.7rem;
+            font-weight: 700;
+            transform: translateX(-50%);
+        }
+        .timeline-marker:hover .timeline-marker-label,
+        .timeline-marker:focus .timeline-marker-label { display: block; }
+        .timeline-selection-window {
+            position: absolute;
+            top: 64px;
+            height: 86px;
+            border: 2px solid #2563eb;
+            background: rgba(37, 99, 235, 0.06);
+            box-sizing: border-box;
+            z-index: 6;
+            pointer-events: none;
+        }
+        .timeline-selection-handle {
+            position: absolute;
+            top: 60px;
+            width: 32px;
+            height: 94px;
+            transform: translateX(-50%);
+            z-index: 9;
+            cursor: ew-resize;
+            touch-action: none;
+        }
+        .timeline-selection-handle::after {
+            content: "";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            width: 8px;
+            height: 30px;
+            border-radius: 4px;
+            background: #2563eb;
+            transform: translateY(-50%);
+        }
+        .timeline-axis-tick {
+            position: absolute;
+            top: 162px;
+            height: 7px;
+            border-left: 1px solid #94a3b8;
+        }
+        .timeline-axis-label {
+            position: absolute;
+            top: 172px;
+            transform: translateX(-50%);
+            color: #64748b;
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+        .timeline-axis-label.edge-start { transform: none; }
+        .timeline-axis-label.edge-end { transform: translateX(-100%); }
+        .timeline-hover-line {
+            display: none;
+            position: absolute;
+            top: 62px;
+            height: 90px;
+            border-left: 2px solid #0f172a;
+            z-index: 7;
+            pointer-events: none;
+        }
+        .timeline-tooltip {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            width: max-content;
+            max-width: min(300px, calc(100vw - 24px));
+            padding: 8px 10px;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            background: #0f172a;
+            color: white;
+            font-size: 0.75rem;
+            line-height: 1.45;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+        .timeline-tooltip .timeline-detail-heading { font-size: 0.78rem; }
+        .timeline-tooltip .timeline-detail-line { font-size: 0.75rem; }
+        .timeline-legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 4px;
+            color: #475569;
+            font-size: 0.78rem;
+        }
+        .timeline-legend-item { display: flex; align-items: center; gap: 5px; }
+        .timeline-legend-swatch { width: 14px; height: 14px; border: 1px solid #cbd5e1; border-radius: 3px; }
+        .timeline-legend-swatch.pre-visa { background: #e2e8f0; }
+        .timeline-legend-swatch.inside { background: #ffffff; }
+        .timeline-legend-swatch.outside { background: var(--absent-day); }
+        .timeline-legend-swatch.travel { background: #fef08a; }
+        .timeline-legend-swatch.compliant { background: #16a34a; }
+        .timeline-legend-swatch.breach { background: #ef4444; }
 
         .trip-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
         .trip-table th, .trip-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
@@ -226,6 +458,7 @@
         .badge.danger { background-color: var(--danger); }
 
         .delete-btn { background: none; color: var(--danger); border: none; cursor: pointer; padding: 0; font-size: 0.9rem; text-decoration: underline; width: auto; }
+        .delete-btn:hover { background: none; color: #b91c1c; }
         .note { font-size: 0.8rem; color: #64748b; margin-top: 5px; font-style: italic; }
         .highlight-box { background: #fffbeb; border: 1px solid #fef3c7; padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 0.85rem; color: #92400e; }
 
@@ -555,6 +788,41 @@
                 width: 100%;
             }
 
+            .absence-timeline-plot {
+                height: 270px;
+            }
+
+            .timeline-tooltip {
+                left: 50% !important;
+                right: auto !important;
+                top: auto !important;
+                bottom: 12px !important;
+                width: min(300px, calc(100vw - 20px));
+                max-width: calc(100vw - 20px);
+                transform: translateX(-50%) !important;
+            }
+
+            .timeline-summary .timeline-detail-grid {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .timeline-range-btn {
+                width: 100%;
+            }
+
+            .timeline-selected-label {
+                display: none;
+            }
+
+            .timeline-selection-handle {
+                width: 48px;
+            }
+
+            .timeline-selection-handle::after {
+                left: 20px;
+            }
+
             .card > div[style*="display: flex"][style*="justify-content: space-between"] {
                 flex-direction: column;
                 align-items: stretch !important;
@@ -866,9 +1134,44 @@
             </div>
 
             <div class="card">
-                <h2 data-i18n="absenceVisualizerTitle">6-Year Absence Visualizer</h2>
-                <p class="note" style="margin-bottom: 15px;" data-i18n="absenceVisualizerNote">Yearly blocks are derived starting from your official Visa Grant date. Years 1–5 monitor the 180-day rolling window.</p>
-                <div class="timeline" id="timelineContainer"></div>
+                <h2 data-i18n="absenceVisualizerTitle">6-Year Absence Timeline</h2>
+                <p class="note" style="margin-bottom: 15px;" data-i18n="absenceVisualizerNote">The timeline runs from the month before your visa grant to the month after projected citizenship. Drag either blue range handle to focus the inspection period; use zoom to expand the timeline and scroll horizontally.</p>
+                <div class="timeline-summary" id="timelineRangeSummary" aria-live="polite"></div>
+                <div class="timeline-range-actions">
+                    <button type="button" class="timeline-range-btn" onclick="setTimelineSelectionToTwelveMonths()" data-i18n="timelineSelectTwelveMonths">↔️ Select 12 months</button>
+                    <button type="button" class="timeline-range-btn" onclick="shiftTimelineSelectionToToday('start')" data-i18n="timelineStartToday">📍 Set start to today</button>
+                    <button type="button" class="timeline-range-btn" onclick="shiftTimelineSelectionToToday('end')" data-i18n="timelineEndToday">🏁 Set end to today</button>
+                </div>
+                <div class="timeline-zoom-control">
+                    <div class="timeline-zoom-label">
+                        <label for="timelineZoom" data-i18n="timelineZoom">Zoom</label>
+                        <span id="timelineZoomLabel">1×</span>
+                    </div>
+                    <input type="range" id="timelineZoom" min="1" max="6" step="0.25" value="1" oninput="updateTimelineZoom()">
+                </div>
+                <div class="absence-timeline-viewport" id="absenceTimelineViewport">
+                    <div class="absence-timeline-plot" id="absenceTimelinePlot" role="img" aria-label="Absence and compliance timeline">
+                        <div class="timeline-lane-label presence" data-i18n="timelinePresenceLane">Presence</div>
+                        <div class="absence-timeline-track presence" id="absenceTimelinePresenceTrack"></div>
+                        <div class="timeline-lane-label compliance" data-i18n="timelineComplianceLane">Compliance</div>
+                        <div class="absence-timeline-track compliance" id="absenceTimelineComplianceTrack"></div>
+                        <div id="absenceTimelineMarkers"></div>
+                        <div id="absenceTimelineAxis"></div>
+                        <div class="timeline-selection-window" id="timelineSelectionWindow"></div>
+                        <div class="timeline-selection-handle" id="timelineSelectionHandleStart" role="slider" tabindex="0" aria-label="Range start"></div>
+                        <div class="timeline-selection-handle" id="timelineSelectionHandleEnd" role="slider" tabindex="0" aria-label="Range end"></div>
+                        <div class="timeline-hover-line" id="timelineHoverLine"></div>
+                    </div>
+                </div>
+                <div class="timeline-tooltip" id="timelineTooltip" role="tooltip"></div>
+                <div class="timeline-legend">
+                    <span class="timeline-legend-item"><span class="timeline-legend-swatch pre-visa"></span><span data-i18n="timelineBeforeVisa">Before visa</span></span>
+                    <span class="timeline-legend-item"><span class="timeline-legend-swatch inside"></span><span data-i18n="timelineInsideUk">In the UK</span></span>
+                    <span class="timeline-legend-item"><span class="timeline-legend-swatch outside"></span><span data-i18n="timelineOutsideUk">Outside the UK</span></span>
+                    <span class="timeline-legend-item"><span class="timeline-legend-swatch travel"></span><span data-i18n="travelDay">Travel Day</span></span>
+                    <span class="timeline-legend-item"><span class="timeline-legend-swatch compliant"></span><span data-i18n="timelineCompliant">Compliant</span></span>
+                    <span class="timeline-legend-item"><span class="timeline-legend-swatch breach"></span><span data-i18n="timelineNonCompliant">Non-compliant</span></span>
+                </div>
             </div>
 
             <div class="card">
@@ -969,8 +1272,37 @@
             citizenshipFinalYear: "📅 Citizenship Final Year Remaining Days",
             cushionVs90: "Cushion vs 90-day Y6 limit.",
             citizenY6Rule: "<strong>How calculated:</strong> inactive until Year 6 starts; then 90 minus counted absent days in the final qualifying year.",
-            absenceVisualizerTitle: "6-Year Absence Visualizer",
-            absenceVisualizerNote: "Yearly blocks are derived starting from your official Visa Grant date. Years 1–5 monitor the 180-day rolling window.",
+            absenceVisualizerTitle: "6-Year Absence Timeline",
+            absenceVisualizerNote: "The timeline runs from the month before your visa grant to the month after projected citizenship.",
+            timelineZoom: "Zoom",
+            timelineSelectTwelveMonths: "↔️ Select 12 months",
+            timelineStartToday: "📍 Set start to today",
+            timelineEndToday: "🏁 Set end to today",
+            timelineBeforeVisa: "Before visa",
+            timelineBeforeVisaStatus: "Before the visa qualifying timeline begins",
+            timelineComplianceNotActive: "Compliance rules are not active yet.",
+            timelineSelectionStart: "Range start",
+            timelineSelectionEnd: "Range end",
+            timelineSelectedPeriod: "Selected period",
+            timelineDaysSelectedMetric: "{days} days selected",
+            timelineAbsentDaysMetric: "{days} absent days",
+            timelinePeakRollingMetric: "Peak rolling absence: {days} days",
+            timelinePresenceLane: "Presence",
+            timelineComplianceLane: "Compliance",
+            timelineInsideUk: "In the UK",
+            timelineOutsideUk: "Outside the UK",
+            timelineCompliant: "Compliant",
+            timelineNonCompliant: "Non-compliant",
+            timelineRangeSummary: "{start} to {end} · {days} days selected · {absent} absent days · peak rolling absence {peak} days",
+            timelineCompliantDay: "No compliance limit is breached on this date.",
+            timelineRollingWindowBreach: "Rolling 12-month window ending {end}: {count} absent days ({excess} above the 180-day limit).",
+            timelineCitizenPeriodBreach: "Citizenship five-year period {start} to {end}: {count} absent days ({excess} above the 450-day limit).",
+            timelineFinalYearPeriodBreach: "Citizenship final-year period {start} to {end}: {count} absent days ({excess} above the 90-day limit).",
+            timelineRestartedComplianceExplanation: "This non-compliant period belongs to the previous qualifying calculation and ends when recalculation restarts on {date}; compliant days after that are assessed under the renewed period.",
+            timelineVisaGrantMarker: "Visa grant",
+            timelineFirstEntryMarker: "First UK entry",
+            timelineIlrMarker: "Earliest ILR application",
+            timelineCitizenMarker: "Earliest citizenship application",
             calendarHoverNote: "Hover over any active date block to audit the full Safety Cushion Breakdown for that specific date.",
             regularDay: "Regular Day",
             absentDay: "Absent Day",
@@ -1084,8 +1416,37 @@
             citizenshipFinalYear: "📅 尚餘入籍最後一年限制日數",
             cushionVs90: "距離第 6 年 90 日上限尚餘的日數。",
             citizenY6Rule: "<strong>計算方法：</strong>第 6 年開始前不適用；開始後以 90 減去最後合資格年度內的離境日數。",
-            absenceVisualizerTitle: "6 年離境紀錄總覽",
-            absenceVisualizerNote: "每年會根據簽證批出日期計算，第 1 至第 5 年會監察 180 日滾動限制。",
+            absenceVisualizerTitle: "6 年離境時間線",
+            absenceVisualizerNote: "時間線由簽證批出月份之前一個月開始，至預計可申請入籍月份之後一個月結束。",
+            timelineZoom: "縮放",
+            timelineSelectTwelveMonths: "↔️ 選取 12 個月",
+            timelineStartToday: "📍 開始設為今日",
+            timelineEndToday: "🏁 結束設為今日",
+            timelineBeforeVisa: "簽證批出前",
+            timelineBeforeVisaStatus: "簽證合資格時間線尚未開始",
+            timelineComplianceNotActive: "合規規則尚未生效。",
+            timelineSelectionStart: "範圍開始",
+            timelineSelectionEnd: "範圍結束",
+            timelineSelectedPeriod: "已選期間",
+            timelineDaysSelectedMetric: "已選 {days} 日",
+            timelineAbsentDaysMetric: "離境 {days} 日",
+            timelinePeakRollingMetric: "12 個月滾動離境最高 {days} 日",
+            timelinePresenceLane: "身處地點",
+            timelineComplianceLane: "合規狀況",
+            timelineInsideUk: "身處英國",
+            timelineOutsideUk: "不在英國",
+            timelineCompliant: "合規",
+            timelineNonCompliant: "不合規",
+            timelineRangeSummary: "{start} 至 {end} · 已選 {days} 日 · 離境 {absent} 日 · 12 個月滾動離境最高 {peak} 日",
+            timelineCompliantDay: "此日期沒有超出任何離境限制。",
+            timelineRollingWindowBreach: "截至 {end} 的 12 個月期間共有 {count} 日離境（超出 180 日上限 {excess} 日）。",
+            timelineCitizenPeriodBreach: "入籍五年期間 {start} 至 {end} 共有 {count} 日離境（超出 450 日上限 {excess} 日）。",
+            timelineFinalYearPeriodBreach: "入籍最後一年期間 {start} 至 {end} 共有 {count} 日離境（超出 90 日上限 {excess} 日）。",
+            timelineRestartedComplianceExplanation: "此不合規期間屬於上一個合資格計算期，並於 {date} 重新開始計算時結束；其後的合規日子會按新的計算期評估。",
+            timelineVisaGrantMarker: "簽證批出",
+            timelineFirstEntryMarker: "首次入境英國",
+            timelineIlrMarker: "最早可申請永久居留",
+            timelineCitizenMarker: "最早可申請入籍",
             calendarHoverNote: "將滑鼠移到日期上，可查看該日詳細的尚可離境日數。",
             regularDay: "普通日子",
             absentDay: "不在英國",
@@ -1275,6 +1636,9 @@
     let displayedTimelineYears = [];
     let previousVisaYears = [];
     let renewalInfo = null;
+    let timelineView = null;
+    let timelineSelectionDragHandle = null;
+    let timelineTouchHoverActive = false;
 
     const TODAY_ANCHOR = parseLocalDate(getLondonTodayString());
 
@@ -1282,6 +1646,9 @@
         applyLanguage();
         document.getElementById('dateOut').value = formatDateLocal(TODAY_ANCHOR);
         document.getElementById('dateIn').value = formatDateLocal(TODAY_ANCHOR);
+
+        document.addEventListener('pointerdown', dismissTimelineTooltipOutsidePlot);
+        document.addEventListener('touchstart', dismissTimelineTooltipOutsidePlot, { passive: true });
 
         loadSavedData();
         restoreCushionDateState();
@@ -1925,38 +2292,743 @@
         }
     }
 
-    function renderDOM() {
-        const container = document.getElementById('timelineContainer');
-        container.innerHTML = '';
+    function getAbsenceTimelineBounds() {
+        const visaStartValue = document.getElementById('visaStart').value;
+        if (!isValidDateString(visaStartValue)) return null;
 
-        (displayedTimelineYears.length ? displayedTimelineYears : visaYears).forEach(y => {
-            if (y.marker) {
-                container.innerHTML += `<div class="renewal-marker">${t('renewedStartDate', { date: formatDateForDisplay(y.start, { year: 'numeric', month: 'long', day: 'numeric' }) })}</div>`;
-                return;
+        const visaGrantDate = parseLocalDate(visaStartValue);
+        const projectedCitizenshipDate = isValidDateString(cachedCitizenDateString)
+            ? parseLocalDate(cachedCitizenDateString)
+            : (visaYears.length >= 6 ? visaYears[5].end : addDays(visaGrantDate, 365 * 6));
+
+        return {
+            start: new Date(visaGrantDate.getFullYear(), visaGrantDate.getMonth() - 1, 1, 12),
+            selectableEnd: new Date(projectedCitizenshipDate.getFullYear(), projectedCitizenshipDate.getMonth() + 1, 0, 12),
+            end: new Date(projectedCitizenshipDate.getFullYear(), projectedCitizenshipDate.getMonth() + 2, 0, 12)
+        };
+    }
+
+    function initializeAbsenceTimeline() {
+        const bounds = getAbsenceTimelineBounds();
+        if (!bounds) return;
+
+        const plot = document.getElementById('absenceTimelinePlot');
+        plot.onpointerdown = beginMobileTimelineHover;
+        plot.onpointermove = event => {
+            if (event.pointerType === 'touch') dragMobileTimelineHover(event);
+            else handleTimelinePointer(event);
+        };
+        plot.onpointerup = finishMobileTimelineHover;
+        plot.onpointercancel = cancelMobileTimelineHover;
+        plot.ontouchstart = beginMobileTimelineTouchHover;
+        plot.ontouchmove = dragMobileTimelineTouchHover;
+        plot.ontouchend = finishMobileTimelineTouchHover;
+        plot.ontouchcancel = cancelMobileTimelineHover;
+        plot.onclick = handleTimelinePointer;
+        plot.onpointerleave = event => {
+            if (timelineSelectionDragHandle === null && event.pointerType !== 'touch') hideTimelineTooltip();
+        };
+
+        const startHandle = document.getElementById('timelineSelectionHandleStart');
+        const endHandle = document.getElementById('timelineSelectionHandleEnd');
+        startHandle.setAttribute('aria-label', t('timelineSelectionStart'));
+        endHandle.setAttribute('aria-label', t('timelineSelectionEnd'));
+        startHandle.onpointerdown = event => beginTimelineRangeSelection('start', event);
+        endHandle.onpointerdown = event => beginTimelineRangeSelection('end', event);
+        startHandle.ontouchstart = event => beginTimelineTouchRangeSelection('start', event);
+        endHandle.ontouchstart = event => beginTimelineTouchRangeSelection('end', event);
+        startHandle.onclick = event => event.stopPropagation();
+        endHandle.onclick = event => event.stopPropagation();
+        startHandle.onkeydown = event => adjustTimelineSelectionWithKeyboard('start', event);
+        endHandle.onkeydown = event => adjustTimelineSelectionWithKeyboard('end', event);
+        [startHandle, endHandle].forEach(handle => {
+            handle.onpointermove = dragTimelineRangeSelection;
+            handle.onpointerup = finishTimelineRangeSelection;
+            handle.onpointercancel = finishTimelineRangeSelection;
+            handle.ontouchmove = dragTimelineTouchRangeSelection;
+            handle.ontouchend = finishTimelineTouchRangeSelection;
+            handle.ontouchcancel = finishTimelineTouchRangeSelection;
+        });
+
+        renderAbsenceTimeline();
+        initializeTimelineZoom();
+    }
+
+    function initializeTimelineZoom() {
+        const zoomInput = document.getElementById('timelineZoom');
+        const storedZoom = parseFloat(localStorage.getItem('bno_timeline_zoom'));
+        zoomInput.value = Number.isFinite(storedZoom)
+            ? Math.max(1, Math.min(6, storedZoom))
+            : 1;
+        updateTimelineZoom(false);
+    }
+
+    function updateTimelineZoom(saveZoom = true) {
+        const zoomInput = document.getElementById('timelineZoom');
+        const zoom = Math.max(1, Math.min(6, parseFloat(zoomInput.value) || 1));
+        const viewport = document.getElementById('absenceTimelineViewport');
+        const plot = document.getElementById('absenceTimelinePlot');
+        const previousWidth = Math.max(viewport.clientWidth, viewport.scrollWidth);
+        const centreRatio = previousWidth > 0
+            ? (viewport.scrollLeft + (viewport.clientWidth / 2)) / previousWidth
+            : 0.5;
+
+        plot.style.width = `${zoom * 100}%`;
+        viewport.style.overflowX = zoom > 1 ? 'auto' : 'hidden';
+        document.getElementById('timelineZoomLabel').innerText = `${Number(zoom.toFixed(2))}×`;
+        if (saveZoom) localStorage.setItem('bno_timeline_zoom', zoom);
+
+        const restoreCentre = () => {
+            if (zoom === 1) {
+                viewport.scrollLeft = 0;
+            } else {
+                viewport.scrollLeft = Math.max(0, (centreRatio * viewport.scrollWidth) - (viewport.clientWidth / 2));
+            }
+        };
+        if (window.requestAnimationFrame) window.requestAnimationFrame(restoreCentre);
+        else restoreCentre();
+    }
+
+    function buildTimelineComplianceIntervals(bounds) {
+        const intervals = [];
+        const timelines = renewalInfo && previousVisaYears.length >= 6
+            ? [
+                {
+                    years: previousVisaYears,
+                    rollingMap: previousDailyRollingAbsencesMap,
+                    periodEnd: addDays(renewalInfo.start, -1)
+                },
+                {
+                    years: visaYears,
+                    rollingMap: dailyRollingAbsencesMap,
+                    periodStart: new Date(renewalInfo.start)
+                }
+            ]
+            : [{ years: visaYears, rollingMap: dailyRollingAbsencesMap }];
+
+        timelines.forEach(({ years, rollingMap, periodStart = null, periodEnd = null }) => {
+            if (years.length < 6) return;
+            const addTimelineInterval = interval => {
+                const start = periodStart && interval.start < periodStart
+                    ? new Date(periodStart)
+                    : new Date(interval.start);
+                const end = periodEnd && interval.end > periodEnd
+                    ? new Date(periodEnd)
+                    : new Date(interval.end);
+                const endedAtRestart = !!(periodEnd && interval.end >= periodEnd);
+                if (start <= end) {
+                    intervals.push({
+                        ...interval,
+                        start,
+                        end,
+                        endedAtRestart,
+                        restartDate: endedAtRestart ? addDays(periodEnd, 1) : null
+                    });
+                }
+            };
+            const rollingFailures = [];
+            let date = new Date(years[0].start);
+            const rollingEvaluationEnd = periodEnd && periodEnd < years[4].end
+                ? periodEnd
+                : years[4].end;
+            while (date <= rollingEvaluationEnd) {
+                const dateStr = formatDateLocal(date);
+                const count = rollingMap[dateStr] || 0;
+                if (count > 180) {
+                    rollingFailures.push({
+                        start: addDays(date, -364),
+                        end: new Date(date),
+                        count,
+                        endStr: dateStr
+                    });
+                }
+                date.setDate(date.getDate() + 1);
             }
 
-            let statusClass = 'safe';
-            let maxLimit = y.yearNum === 6 ? 90 : 180;
-            if (y.absences > maxLimit) statusClass = 'danger';
-            else if (y.absences > (maxLimit * 0.8)) statusClass = 'warning';
+            let mergedFailure = null;
+            rollingFailures.forEach(failure => {
+                if (!mergedFailure || failure.start > addDays(mergedFailure.end, 1)) {
+                    if (mergedFailure) addTimelineInterval(mergedFailure);
+                    mergedFailure = {
+                        start: failure.start,
+                        end: failure.end,
+                        type: 'rolling',
+                        worstCount: failure.count,
+                        worstEnd: failure.endStr
+                    };
+                } else {
+                    if (failure.end > mergedFailure.end) mergedFailure.end = failure.end;
+                    if (failure.count > mergedFailure.worstCount) {
+                        mergedFailure.worstCount = failure.count;
+                        mergedFailure.worstEnd = failure.endStr;
+                    }
+                }
+            });
+            if (mergedFailure) addTimelineInterval(mergedFailure);
 
-            const cardClass = y.displayType === 'disqualified' ? 'disqualified' : (y.renewed ? `${statusClass} renewed` : statusClass);
-            const label = y.displayType === 'disqualified'
-                ? `${t('disqualifiedPeriod')} ${y.yearNum}`
-                : (y.renewed ? t('renewedYear', { year: y.yearNum }) : t('year', { year: y.yearNum }));
-            const badgeText = y.displayType === 'disqualified'
-                ? t('disqualifiedBadge')
-                : (y.renewed ? `${t('renewedBadge')} · ${y.absences > maxLimit ? t('breached') : t('ok')}` : `${y.absences > maxLimit ? t('breached') : t('ok')}`);
+            const citizenshipTotal = countAbsencesBetween(years[1].start, years[5].end);
+            if (citizenshipTotal > 450) {
+                addTimelineInterval({
+                    start: new Date(years[1].start),
+                    end: new Date(years[5].end),
+                    type: 'citizenship-total',
+                    count: citizenshipTotal
+                });
+            }
 
-            container.innerHTML += `
-                <div class="year-card ${cardClass}">
-                    <div class="year-label">${label}</div>
-                    <div class="year-dates">${formatDateLocal(y.start)} to ${formatDateLocal(y.end)}</div>
-                    <div class="year-days">${y.absences} ${t('daysTitle')}</div>
-                    <span class="badge ${statusClass}">${badgeText}</span>
-                </div>
-            `;
+            const finalYearTotal = countAbsencesBetween(years[5].start, years[5].end);
+            if (finalYearTotal > 90) {
+                addTimelineInterval({
+                    start: new Date(years[5].start),
+                    end: new Date(years[5].end),
+                    type: 'citizenship-final-year',
+                    count: finalYearTotal
+                });
+            }
         });
+
+        return intervals
+            .map(interval => ({
+                ...interval,
+                start: interval.start < bounds.start ? new Date(bounds.start) : interval.start,
+                end: interval.end > bounds.end ? new Date(bounds.end) : interval.end
+            }))
+            .filter(interval => interval.start <= interval.end);
+    }
+
+    function getTimelineComplianceExplanation(interval) {
+        let explanation;
+        if (interval.type === 'rolling') {
+            explanation = t('timelineRollingWindowBreach', {
+                end: interval.worstEnd,
+                count: interval.worstCount,
+                excess: interval.worstCount - 180
+            });
+        } else if (interval.type === 'citizenship-total') {
+            explanation = t('timelineCitizenPeriodBreach', {
+                start: formatDateLocal(interval.start),
+                end: formatDateLocal(interval.end),
+                count: interval.count,
+                excess: interval.count - 450
+            });
+        } else {
+            explanation = t('timelineFinalYearPeriodBreach', {
+                start: formatDateLocal(interval.start),
+                end: formatDateLocal(interval.end),
+                count: interval.count,
+                excess: interval.count - 90
+            });
+        }
+
+        if (interval.endedAtRestart && interval.restartDate) {
+            explanation += ` ${t('timelineRestartedComplianceExplanation', {
+                date: formatDateForDisplay(interval.restartDate, { year: 'numeric', month: 'long', day: 'numeric' })
+            })}`;
+        }
+        return explanation;
+    }
+
+    function buildTimelineDayData(bounds, complianceIntervals) {
+        const totalDays = calendarDayDiff(bounds.start, bounds.end) + 1;
+        const visaGrantDate = parseLocalDate(document.getElementById('visaStart').value);
+        const dayData = [];
+        for (let offset = 0; offset < totalDays; offset++) {
+            const date = addDays(bounds.start, offset);
+            const dateStr = formatDateLocal(date);
+            const status = globalAbsenceMap[dateStr] || null;
+            const isPreviousPeriod = !!(renewalInfo && previousVisaYears.length >= 6 && date < renewalInfo.start);
+            const rollingMap = isPreviousPeriod ? previousDailyRollingAbsencesMap : dailyRollingAbsencesMap;
+            const complianceReasons = complianceIntervals
+                .filter(interval => date >= interval.start && date <= interval.end)
+                .map(getTimelineComplianceExplanation);
+
+            dayData.push({
+                date,
+                dateStr,
+                status,
+                presenceStatus: date < visaGrantDate
+                    ? 'pre-visa'
+                    : (status ? (status.type === 'travel' ? 'travel' : 'outside') : 'inside'),
+                complianceStatus: date < visaGrantDate
+                    ? 'pre-visa'
+                    : (complianceReasons.length ? 'breach' : 'compliant'),
+                rollingCount: rollingMap[dateStr] || 0,
+                complianceReasons
+            });
+        }
+        return dayData;
+    }
+
+    function renderAbsenceTimeline() {
+        const bounds = getAbsenceTimelineBounds();
+        if (!bounds) return;
+        const complianceIntervals = buildTimelineComplianceIntervals(bounds);
+        const dayData = buildTimelineDayData(bounds, complianceIntervals);
+        const totalDays = dayData.length;
+        const clampOffset = value => Math.max(0, Math.min(totalDays - 1, value));
+        const visaGrantDate = parseLocalDate(document.getElementById('visaStart').value);
+        const minSelectionIndex = clampOffset(calendarDayDiff(bounds.start, visaGrantDate));
+        const maxSelectionIndex = clampOffset(calendarDayDiff(bounds.start, bounds.selectableEnd));
+        const clampSelectionOffset = value => Math.max(minSelectionIndex, Math.min(maxSelectionIndex, value));
+        const storedStart = localStorage.getItem('bno_timeline_range_start');
+        const storedEnd = localStorage.getItem('bno_timeline_range_end');
+        let selectionStart = isValidDateString(storedStart)
+            ? clampSelectionOffset(calendarDayDiff(bounds.start, parseLocalDate(storedStart)))
+            : minSelectionIndex;
+        let selectionEnd = isValidDateString(storedEnd)
+            ? clampSelectionOffset(calendarDayDiff(bounds.start, parseLocalDate(storedEnd)))
+            : maxSelectionIndex;
+        if (selectionStart > selectionEnd) [selectionStart, selectionEnd] = [selectionEnd, selectionStart];
+
+        renderTimelineSegments(document.getElementById('absenceTimelinePresenceTrack'), dayData, 'presenceStatus');
+        renderTimelineSegments(document.getElementById('absenceTimelineComplianceTrack'), dayData, 'complianceStatus');
+        renderTimelineMilestones(bounds.start, bounds.end, totalDays);
+        renderTimelineAxis(bounds.start, bounds.end, totalDays);
+
+        timelineView = { bounds, dayData, selectionStart, selectionEnd, minSelectionIndex, maxSelectionIndex };
+        renderTimelineSelection(selectionStart, selectionEnd, false);
+        hideTimelineTooltip();
+    }
+
+    function renderTimelineSegments(track, dayData, statusKey) {
+        track.innerHTML = '';
+        let segmentStart = 0;
+        for (let index = 1; index <= dayData.length; index++) {
+            const statusChanged = index === dayData.length || dayData[index][statusKey] !== dayData[segmentStart][statusKey];
+            if (!statusChanged) continue;
+            const segment = document.createElement('div');
+            segment.className = `timeline-segment ${dayData[segmentStart][statusKey]}`;
+            segment.style.left = `${(segmentStart / dayData.length) * 100}%`;
+            segment.style.width = `${((index - segmentStart) / dayData.length) * 100}%`;
+            track.appendChild(segment);
+            segmentStart = index;
+        }
+    }
+
+    function renderTimelineSelection(firstIndex, secondIndex, saveSelection) {
+        if (!timelineView) return;
+        const totalDays = timelineView.dayData.length;
+        const startIndex = Math.max(timelineView.minSelectionIndex, Math.min(timelineView.maxSelectionIndex, Math.min(firstIndex, secondIndex)));
+        const endIndex = Math.max(startIndex, Math.min(timelineView.maxSelectionIndex, Math.max(firstIndex, secondIndex)));
+        const leftPercent = (startIndex / totalDays) * 100;
+        const rightPercent = ((endIndex + 1) / totalDays) * 100;
+        const selectionWindow = document.getElementById('timelineSelectionWindow');
+        const startHandle = document.getElementById('timelineSelectionHandleStart');
+        const endHandle = document.getElementById('timelineSelectionHandleEnd');
+
+        selectionWindow.style.left = `${leftPercent}%`;
+        selectionWindow.style.width = `${Math.max(0.15, rightPercent - leftPercent)}%`;
+        startHandle.style.left = `${leftPercent}%`;
+        endHandle.style.left = `${rightPercent}%`;
+        startHandle.style.transform = 'translateX(-50%)';
+        endHandle.style.transform = 'translateX(-50%)';
+
+        timelineView.selectionStart = startIndex;
+        timelineView.selectionEnd = endIndex;
+        const selectedData = timelineView.dayData.slice(startIndex, endIndex + 1);
+        const selectedStart = selectedData[0].date;
+        const selectedEnd = selectedData[selectedData.length - 1].date;
+        startHandle.setAttribute('aria-valuemin', String(timelineView.minSelectionIndex));
+        startHandle.setAttribute('aria-valuemax', String(timelineView.maxSelectionIndex));
+        startHandle.setAttribute('aria-valuenow', String(startIndex));
+        startHandle.setAttribute('aria-valuetext', formatDateLocal(selectedStart));
+        endHandle.setAttribute('aria-valuemin', '0');
+        endHandle.setAttribute('aria-valuemax', String(timelineView.maxSelectionIndex));
+        endHandle.setAttribute('aria-valuenow', String(endIndex));
+        endHandle.setAttribute('aria-valuetext', formatDateLocal(selectedEnd));
+        const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+        const absentDays = selectedData.filter(day => day.status && day.status.type === 'absent').length;
+        const peakRolling = selectedData.reduce((peak, day) => Math.max(peak, day.rollingCount), 0);
+        const startText = formatDateForDisplay(selectedStart, dateOptions);
+        const endText = formatDateForDisplay(selectedEnd, dateOptions);
+        const summary = t('timelineRangeSummary', {
+            start: startText,
+            end: endText,
+            days: selectedData.length,
+            absent: absentDays,
+            peak: peakRolling
+        });
+        document.getElementById('timelineRangeSummary').innerHTML = `
+            <div class="timeline-detail-heading">📅 <strong><span class="timeline-selected-label">${escapeTimelineText(t('timelineSelectedPeriod'))}:</span><span class="timeline-selected-dates"> ${escapeTimelineText(startText)} → ${escapeTimelineText(endText)}</span></strong></div>
+            <hr class="timeline-detail-divider">
+            <div class="timeline-detail-grid">
+                <span>🗓️ <strong>${escapeTimelineText(t('timelineDaysSelectedMetric', { days: selectedData.length }))}</strong></span>
+                <span>✈️ <strong>${escapeTimelineText(t('timelineAbsentDaysMetric', { days: absentDays }))}</strong></span>
+                <span>⏳ <strong>${escapeTimelineText(t('timelinePeakRollingMetric', { days: peakRolling }))}</strong></span>
+            </div>
+        `;
+        document.getElementById('absenceTimelinePlot').setAttribute('aria-label', summary);
+
+        if (saveSelection) {
+            localStorage.setItem('bno_timeline_range_start', formatDateLocal(selectedStart));
+            localStorage.setItem('bno_timeline_range_end', formatDateLocal(selectedEnd));
+        }
+    }
+
+    function setTimelineSelectionToTwelveMonths() {
+        if (!timelineView || !timelineView.dayData.length) return;
+        const startIndex = timelineView.selectionStart;
+        const selectedStart = timelineView.dayData[startIndex].date;
+        const twelveMonthEnd = new Date(selectedStart);
+        twelveMonthEnd.setFullYear(twelveMonthEnd.getFullYear() + 1);
+        twelveMonthEnd.setDate(twelveMonthEnd.getDate() - 1);
+        const endIndex = Math.min(
+            timelineView.maxSelectionIndex,
+            calendarDayDiff(timelineView.bounds.start, twelveMonthEnd)
+        );
+        renderTimelineSelection(startIndex, Math.max(startIndex, endIndex), true);
+    }
+
+    function shiftTimelineSelectionToToday(anchor) {
+        if (!timelineView || !timelineView.dayData.length) return;
+        const periodSpan = timelineView.selectionEnd - timelineView.selectionStart;
+        const todayIndex = Math.max(
+            timelineView.minSelectionIndex,
+            Math.min(
+                timelineView.maxSelectionIndex,
+                calendarDayDiff(timelineView.bounds.start, parseLocalDate(getLondonTodayString()))
+            )
+        );
+        let startIndex;
+        let endIndex;
+
+        if (anchor === 'start') {
+            startIndex = todayIndex;
+            endIndex = startIndex + periodSpan;
+            if (endIndex > timelineView.maxSelectionIndex) {
+                endIndex = timelineView.maxSelectionIndex;
+                startIndex = endIndex - periodSpan;
+            }
+        } else {
+            endIndex = todayIndex;
+            startIndex = endIndex - periodSpan;
+            if (startIndex < timelineView.minSelectionIndex) {
+                startIndex = timelineView.minSelectionIndex;
+                endIndex = startIndex + periodSpan;
+            }
+        }
+
+        renderTimelineSelection(startIndex, endIndex, true);
+    }
+
+    function renderTimelineMilestones(selectedStart, selectedEnd, selectedDays) {
+        const markerContainer = document.getElementById('absenceTimelineMarkers');
+        markerContainer.innerHTML = '';
+        const milestones = [
+            { date: document.getElementById('visaStart').value, label: t('timelineVisaGrantMarker'), className: 'visa' },
+            { date: document.getElementById('entryDate').value, label: t('timelineFirstEntryMarker'), className: 'entry' },
+            { date: cachedILRDateString, label: t('timelineIlrMarker'), className: 'ilr' },
+            { date: cachedCitizenDateString, label: t('timelineCitizenMarker'), className: 'citizenship' },
+            { date: getLondonTodayString(), label: t('today'), className: 'today' }
+        ];
+
+        const groupedMilestones = new Map();
+        milestones.forEach(milestone => {
+            if (!isValidDateString(milestone.date)) return;
+            const date = parseLocalDate(milestone.date);
+            if (date < selectedStart || date > selectedEnd) return;
+            if (!groupedMilestones.has(milestone.date)) groupedMilestones.set(milestone.date, []);
+            groupedMilestones.get(milestone.date).push(milestone);
+        });
+
+        Array.from(groupedMilestones.entries()).forEach(([dateStr, grouped], index) => {
+            const date = parseLocalDate(dateStr);
+            const dayOffset = calendarDayDiff(selectedStart, date);
+            const left = ((dayOffset + 0.5) / selectedDays) * 100;
+            const marker = document.createElement('div');
+            marker.className = `timeline-marker ${grouped[0].className} row-${(index % 2) + 1}`;
+            marker.style.left = `${left}%`;
+            marker.title = `${grouped.map(item => item.label).join(' · ')} — ${dateStr}`;
+            marker.tabIndex = 0;
+            marker.setAttribute('aria-label', marker.title);
+            const label = document.createElement('span');
+            label.className = 'timeline-marker-label';
+            label.textContent = grouped.map(item => item.label).join(' · ');
+            if (left < 15) {
+                label.style.left = '9px';
+                label.style.transform = 'none';
+            } else if (left > 85) {
+                label.style.left = '-5px';
+                label.style.transform = 'translateX(-100%)';
+            }
+            marker.appendChild(label);
+            markerContainer.appendChild(marker);
+        });
+    }
+
+    function renderTimelineAxis(selectedStart, selectedEnd, selectedDays) {
+        const axis = document.getElementById('absenceTimelineAxis');
+        axis.innerHTML = '';
+        const tickCount = selectedDays === 1 ? 1 : (window.innerWidth <= 640 ? 4 : 7);
+        const tickOptions = selectedDays > 730
+            ? { year: 'numeric' }
+            : (selectedDays > 120 ? { month: 'short', year: 'numeric' } : { month: 'short', day: 'numeric' });
+
+        for (let index = 0; index < tickCount; index++) {
+            const ratio = tickCount === 1 ? 0.5 : index / (tickCount - 1);
+            const dayOffset = Math.round(ratio * (selectedDays - 1));
+            const date = addDays(selectedStart, dayOffset);
+            const left = ((dayOffset + 0.5) / selectedDays) * 100;
+            const tick = document.createElement('span');
+            tick.className = 'timeline-axis-tick';
+            tick.style.left = `${left}%`;
+            const label = document.createElement('span');
+            label.className = `timeline-axis-label ${tickCount === 1 ? '' : (index === 0 ? 'edge-start' : (index === tickCount - 1 ? 'edge-end' : ''))}`;
+            label.style.left = `${left}%`;
+            label.textContent = formatDateForDisplay(date, tickOptions);
+            axis.appendChild(tick);
+            axis.appendChild(label);
+        }
+    }
+
+    function escapeTimelineText(value) {
+        return String(value || '').replace(/[&<>"']/g, character => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        })[character]);
+    }
+
+    function getTimelinePointerDayIndex(event) {
+        if (!timelineView || !timelineView.dayData.length) return 0;
+        const trackRect = document.getElementById('absenceTimelinePresenceTrack').getBoundingClientRect();
+        const ratio = trackRect.width > 0
+            ? Math.max(0, Math.min(0.999999, (event.clientX - trackRect.left) / trackRect.width))
+            : 0;
+        return Math.floor(ratio * timelineView.dayData.length);
+    }
+
+    function getTimelineTouchProxy(event, useChangedTouches = false) {
+        const touchList = useChangedTouches ? event.changedTouches : event.touches;
+        const touch = touchList && touchList[0];
+        return {
+            button: 0,
+            clientX: touch ? touch.clientX : 0,
+            clientY: touch ? touch.clientY : 0,
+            pointerType: 'touch',
+            target: event.target,
+            currentTarget: event.currentTarget,
+            preventDefault: () => event.preventDefault(),
+            stopPropagation: () => event.stopPropagation()
+        };
+    }
+
+    function beginTimelineTouchRangeSelection(handleName, event) {
+        event.preventDefault();
+        beginTimelineRangeSelection(handleName, getTimelineTouchProxy(event));
+    }
+
+    function dragTimelineTouchRangeSelection(event) {
+        event.preventDefault();
+        dragTimelineRangeSelection(getTimelineTouchProxy(event));
+    }
+
+    function finishTimelineTouchRangeSelection(event) {
+        event.preventDefault();
+        finishTimelineRangeSelection(getTimelineTouchProxy(event, true));
+    }
+
+    function isTouchWithinTimelineBars(event) {
+        const plotRect = document.getElementById('absenceTimelinePlot').getBoundingClientRect();
+        const y = event.clientY - plotRect.top;
+        return y >= 60 && y <= 154;
+    }
+
+    function beginMobileTimelineHover(event) {
+        if (window.innerWidth > 640 || event.pointerType !== 'touch') return;
+        if (event.target && event.target.closest && event.target.closest('.timeline-selection-handle')) return;
+        if (!isTouchWithinTimelineBars(event)) return;
+        timelineTouchHoverActive = true;
+        handleTimelinePointer(event);
+        if (event.currentTarget.setPointerCapture && event.pointerId !== undefined) event.currentTarget.setPointerCapture(event.pointerId);
+        if (event.preventDefault) event.preventDefault();
+    }
+
+    function dragMobileTimelineHover(event) {
+        if (!timelineTouchHoverActive) return;
+        handleTimelinePointer(event);
+        if (event.preventDefault) event.preventDefault();
+    }
+
+    function finishMobileTimelineHover(event) {
+        if (!timelineTouchHoverActive) return;
+        handleTimelinePointer(event);
+        timelineTouchHoverActive = false;
+        if (event.currentTarget.releasePointerCapture && event.pointerId !== undefined && event.currentTarget.hasPointerCapture && event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+        if (event.preventDefault) event.preventDefault();
+    }
+
+    function cancelMobileTimelineHover() {
+        timelineTouchHoverActive = false;
+    }
+
+    function beginMobileTimelineTouchHover(event) {
+        beginMobileTimelineHover(getTimelineTouchProxy(event));
+    }
+
+    function dragMobileTimelineTouchHover(event) {
+        dragMobileTimelineHover(getTimelineTouchProxy(event));
+    }
+
+    function finishMobileTimelineTouchHover(event) {
+        finishMobileTimelineHover(getTimelineTouchProxy(event, true));
+    }
+
+    function beginTimelineRangeSelection(handleName, event) {
+        if (event.button !== undefined && event.button !== 0) return;
+        timelineSelectionDragHandle = handleName;
+        if (event.currentTarget.setPointerCapture && event.pointerId !== undefined) event.currentTarget.setPointerCapture(event.pointerId);
+        hideTimelineTooltip();
+        if (event.stopPropagation) event.stopPropagation();
+    }
+
+    function dragTimelineRangeSelection(event) {
+        if (timelineSelectionDragHandle === null || !timelineView) return;
+        const dayIndex = getTimelinePointerDayIndex(event);
+        if (timelineSelectionDragHandle === 'start') {
+            renderTimelineSelection(Math.min(dayIndex, timelineView.selectionEnd), timelineView.selectionEnd, false);
+        } else {
+            renderTimelineSelection(timelineView.selectionStart, Math.max(dayIndex, timelineView.selectionStart), false);
+        }
+        if (event.stopPropagation) event.stopPropagation();
+    }
+
+    function adjustTimelineSelectionWithKeyboard(handleName, event) {
+        if (!timelineView || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+        const delta = event.key === 'ArrowLeft' ? -1 : 1;
+        if (handleName === 'start') {
+            const nextStart = Math.max(timelineView.minSelectionIndex, Math.min(timelineView.selectionEnd, timelineView.selectionStart + delta));
+            renderTimelineSelection(nextStart, timelineView.selectionEnd, true);
+        } else {
+            const nextEnd = Math.min(timelineView.dayData.length - 1, Math.max(timelineView.selectionStart, timelineView.selectionEnd + delta));
+            renderTimelineSelection(timelineView.selectionStart, nextEnd, true);
+        }
+        event.preventDefault();
+    }
+
+    function finishTimelineRangeSelection(event) {
+        if (timelineSelectionDragHandle === null || !timelineView) return;
+        dragTimelineRangeSelection(event);
+        renderTimelineSelection(timelineView.selectionStart, timelineView.selectionEnd, true);
+        timelineSelectionDragHandle = null;
+        if (event.currentTarget.releasePointerCapture && event.pointerId !== undefined && event.currentTarget.hasPointerCapture && event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+        if (event.stopPropagation) event.stopPropagation();
+    }
+
+    function handleTimelinePointer(event) {
+        if (!timelineView || !timelineView.dayData.length) return;
+        const plot = document.getElementById('absenceTimelinePlot');
+        const plotRect = plot.getBoundingClientRect();
+        const dayIndex = getTimelinePointerDayIndex(event);
+        const day = timelineView.dayData[dayIndex];
+        const hoverLine = document.getElementById('timelineHoverLine');
+        const tooltip = document.getElementById('timelineTooltip');
+        const x = Math.max(0, Math.min(plotRect.width, event.clientX - plotRect.left));
+        const isToday = day.dateStr === getLondonTodayString();
+        const isILRDay = day.dateStr === cachedILRDateString;
+        const isCitizenDay = day.dateStr === cachedCitizenDateString;
+        let statusText = day.presenceStatus === 'pre-visa'
+            ? t('timelineBeforeVisaStatus')
+            : t('statusInsideUkSafe');
+
+        if (isILRDay) statusText = t('earliestIlrMilestone');
+        else if (isCitizenDay) statusText = t('citizenshipMilestone');
+
+        if (day.status) {
+            const presenceLabel = day.status.labelKey ? t(day.status.labelKey) : day.status.label;
+            statusText = t('statusPrefix', { status: presenceLabel });
+        }
+
+        const cushion = getCushionBreakdownForDate(day.dateStr);
+        const msDays = Math.ceil((day.date - TODAY_ANCHOR) / (1000 * 60 * 60 * 24));
+        const milestoneCountdownText = isILRDay || isCitizenDay
+            ? (msDays > 0
+                ? `<br><span style="color:#fef08a;">${escapeTimelineText(t('daysFromToday', { days: msDays }))}</span>`
+                : `<br><span style="color:#4ade80;">${escapeTimelineText(t('milestoneReached'))}</span>`)
+            : '';
+        const disqualifiedLine = cushion.isPreviousDisqualifiedPeriod
+            ? `<span style="color:#fca5a5; font-weight:700;">${escapeTimelineText(t('disqualifiedPeriod'))}</span><br>`
+            : '';
+        const y6Line = cushion.isHoverDateInYear6
+            ? `📅 ${escapeTimelineText(t('citizenshipFinalYearShort'))}: <strong>${cushion.citizenY6Cushion} ${escapeTimelineText(t('days'))}</strong><br>`
+            : '';
+        const auditSection = day.presenceStatus === 'pre-visa'
+            ? ''
+            : `
+                <hr class="timeline-detail-divider">
+                🛡️ ${escapeTimelineText(t('totalSafeCushion').replace('🛡️ ', ''))}: <span style="color:${cushion.overallCushion > 30 ? '#22c55e' : '#f97316'}; font-weight:bold;">${cushion.overallCushion} ${escapeTimelineText(t('days'))}</span><br>
+                ⏳ ${escapeTimelineText(t('ilrRolling12MonthShort'))}: <strong>${cushion.rollingCushion} ${escapeTimelineText(t('days'))}</strong><br>
+                🌍 ${escapeTimelineText(t('citizenship5YrAccumShort'))}: <strong>${cushion.citizenTotalCushion} ${escapeTimelineText(t('days'))}</strong><br>
+                ${y6Line}
+                <span style="color:#94a3b8;">${escapeTimelineText(t('rollingAbsences', { days: cushion.rollingCount }))}</span>
+            `;
+        const complianceLines = day.complianceStatus === 'pre-visa'
+            ? [t('timelineComplianceNotActive')]
+            : (day.complianceReasons.length ? day.complianceReasons : [t('timelineCompliantDay')]);
+
+        hoverLine.style.display = 'block';
+        hoverLine.style.left = `${x}px`;
+        const complianceClass = day.complianceStatus === 'pre-visa'
+            ? 'timeline-detail-muted'
+            : (day.complianceReasons.length ? 'timeline-detail-danger' : 'timeline-detail-safe');
+        tooltip.innerHTML = `
+            <strong>${escapeTimelineText(day.dateStr)}${isToday ? ` (${escapeTimelineText(t('today'))})` : ''}</strong><br>
+            ${disqualifiedLine}
+            <span style="color:#94a3b8;">${escapeTimelineText(statusText)}</span>${milestoneCountdownText}
+            ${auditSection}
+            <hr class="timeline-detail-divider">
+            <div class="timeline-detail-line ${complianceClass}">🛡️ <strong>${escapeTimelineText(t('timelineComplianceLane'))}:</strong><br>${complianceLines.map(escapeTimelineText).join('<br>')}</div>
+        `;
+        tooltip.style.display = 'block';
+        positionTimelineTooltip(tooltip, event);
+    }
+
+    function positionTimelineTooltip(tooltip, event) {
+        if (window.innerWidth <= 640 || event.pointerType === 'touch') return;
+
+        tooltip.style.right = 'auto';
+        tooltip.style.bottom = 'auto';
+        tooltip.style.transform = 'none';
+        tooltip.style.left = '0px';
+        tooltip.style.top = '0px';
+        const tooltipRect = tooltip.getBoundingClientRect();
+        const clientX = Number.isFinite(event.clientX) ? event.clientX : 0;
+        const clientY = Number.isFinite(event.clientY) ? event.clientY : 0;
+        const viewportWidth = window.innerWidth || 1024;
+        const viewportHeight = window.innerHeight || 768;
+        const tooltipWidth = tooltipRect.width || 0;
+        const tooltipHeight = tooltipRect.height || 0;
+        const gap = 12;
+        const left = clientX + tooltipWidth + gap <= viewportWidth
+            ? clientX + gap
+            : clientX - tooltipWidth - gap;
+        const top = clientY + tooltipHeight + gap <= viewportHeight
+            ? clientY + gap
+            : clientY - tooltipHeight - gap;
+
+        tooltip.style.left = `${Math.max(gap, left)}px`;
+        tooltip.style.top = `${Math.max(gap, top)}px`;
+    }
+
+    function hideTimelineTooltip() {
+        document.getElementById('timelineHoverLine').style.display = 'none';
+        document.getElementById('timelineTooltip').style.display = 'none';
+    }
+
+    function dismissTimelineTooltipOutsidePlot(event) {
+        const plot = document.getElementById('absenceTimelinePlot');
+        if (!plot || plot.contains(event.target)) return;
+        hideTimelineTooltip();
+    }
+
+    function renderDOM() {
+        initializeAbsenceTimeline();
 
         // Keep the cards and status banner aligned with the selected breakdown date.
         // The same calculation powers the calendar hover audit.
