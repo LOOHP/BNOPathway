@@ -364,8 +364,11 @@
             background: rgba(37, 99, 235, 0.06);
             box-sizing: border-box;
             z-index: 6;
-            pointer-events: none;
+            cursor: grab;
+            pointer-events: auto;
+            touch-action: none;
         }
+        .timeline-selection-window.dragging { cursor: grabbing; }
         .timeline-selection-handle {
             position: absolute;
             top: 60px;
@@ -824,6 +827,11 @@
                 left: 20px;
             }
 
+            .timeline-selection-window {
+                cursor: default;
+                pointer-events: none;
+            }
+
             .card > div[style*="display: flex"][style*="justify-content: space-between"] {
                 flex-direction: column;
                 align-items: stretch !important;
@@ -1139,7 +1147,7 @@
                 <p class="note" style="margin-bottom: 15px;" data-i18n="absenceVisualizerNote">The timeline runs from the month before your visa grant to the month after projected citizenship. Drag either blue range handle to focus the inspection period; use zoom to expand the timeline and scroll horizontally.</p>
                 <div class="timeline-summary" id="timelineRangeSummary" aria-live="polite"></div>
                 <div class="timeline-range-actions">
-                    <button type="button" class="timeline-range-btn" onclick="setTimelineSelectionToTwelveMonths()" data-i18n="timelineSelectTwelveMonths">↔️ Select 12 months</button>
+                    <button type="button" class="timeline-range-btn" onclick="setTimelineSelectionToPastTwelveMonths()" data-i18n="timelineSelectTwelveMonths">↔️ Select past 12 months</button>
                     <button type="button" class="timeline-range-btn" onclick="shiftTimelineSelectionToToday('start')" data-i18n="timelineStartToday">📍 Set start to today</button>
                     <button type="button" class="timeline-range-btn" onclick="shiftTimelineSelectionToToday('end')" data-i18n="timelineEndToday">🏁 Set end to today</button>
                 </div>
@@ -1276,7 +1284,7 @@
             absenceVisualizerTitle: "6-Year Absence Timeline",
             absenceVisualizerNote: "The timeline runs from the month before your visa grant to the month after projected citizenship.",
             timelineZoom: "Zoom",
-            timelineSelectTwelveMonths: "↔️ Select 12 months",
+            timelineSelectTwelveMonths: "↔️ Select past 12 months",
             timelineStartToday: "📍 Set start to today",
             timelineEndToday: "🏁 Set end to today",
             timelineBeforeVisa: "Before visa",
@@ -1420,7 +1428,7 @@
             absenceVisualizerTitle: "6 年離境時間線",
             absenceVisualizerNote: "時間線由簽證批出月份之前一個月開始，至預計可申請入籍月份之後一個月結束。",
             timelineZoom: "縮放",
-            timelineSelectTwelveMonths: "↔️ 選取 12 個月",
+            timelineSelectTwelveMonths: "↔️ 選取過去 12 個月",
             timelineStartToday: "📍 開始設為今日",
             timelineEndToday: "🏁 結束設為今日",
             timelineBeforeVisa: "簽證批出前",
@@ -1640,6 +1648,7 @@
     let timelineView = null;
     let timelineSelectionDragHandle = null;
     let timelineTouchHoverActive = false;
+    let timelineRangeDragState = null;
 
     const TODAY_ANCHOR = parseLocalDate(getLondonTodayString());
 
@@ -2332,6 +2341,11 @@
 
         const startHandle = document.getElementById('timelineSelectionHandleStart');
         const endHandle = document.getElementById('timelineSelectionHandleEnd');
+        const selectionWindow = document.getElementById('timelineSelectionWindow');
+        selectionWindow.onpointerdown = beginTimelineRangeDrag;
+        selectionWindow.onpointermove = dragTimelineRange;
+        selectionWindow.onpointerup = finishTimelineRangeDrag;
+        selectionWindow.onpointercancel = finishTimelineRangeDrag;
         startHandle.setAttribute('aria-label', t('timelineSelectionStart'));
         endHandle.setAttribute('aria-label', t('timelineSelectionEnd'));
         startHandle.onpointerdown = event => beginTimelineRangeSelection('start', event);
@@ -2571,6 +2585,7 @@
         const minSelectionIndex = clampOffset(calendarDayDiff(bounds.start, visaGrantDate));
         const maxSelectionIndex = clampOffset(calendarDayDiff(bounds.start, bounds.selectableEnd));
         const clampSelectionOffset = value => Math.max(minSelectionIndex, Math.min(maxSelectionIndex, value));
+        const todaySelectionIndex = clampSelectionOffset(calendarDayDiff(bounds.start, parseLocalDate(getLondonTodayString())));
         const storedStart = localStorage.getItem('bno_timeline_range_start');
         const storedEnd = localStorage.getItem('bno_timeline_range_end');
         let selectionStart = isValidDateString(storedStart)
@@ -2578,7 +2593,7 @@
             : minSelectionIndex;
         let selectionEnd = isValidDateString(storedEnd)
             ? clampSelectionOffset(calendarDayDiff(bounds.start, parseLocalDate(storedEnd)))
-            : maxSelectionIndex;
+            : todaySelectionIndex;
         if (selectionStart > selectionEnd) [selectionStart, selectionEnd] = [selectionEnd, selectionStart];
 
         renderTimelineSegments(document.getElementById('absenceTimelinePresenceTrack'), dayData, 'presenceStatus');
@@ -2666,18 +2681,18 @@
         }
     }
 
-    function setTimelineSelectionToTwelveMonths() {
+    function setTimelineSelectionToPastTwelveMonths() {
         if (!timelineView || !timelineView.dayData.length) return;
-        const startIndex = timelineView.selectionStart;
-        const selectedStart = timelineView.dayData[startIndex].date;
-        const twelveMonthEnd = new Date(selectedStart);
-        twelveMonthEnd.setFullYear(twelveMonthEnd.getFullYear() + 1);
-        twelveMonthEnd.setDate(twelveMonthEnd.getDate() - 1);
-        const endIndex = Math.min(
-            timelineView.maxSelectionIndex,
-            calendarDayDiff(timelineView.bounds.start, twelveMonthEnd)
+        const endIndex = timelineView.selectionEnd;
+        const selectedEnd = timelineView.dayData[endIndex].date;
+        const twelveMonthStart = new Date(selectedEnd);
+        twelveMonthStart.setFullYear(twelveMonthStart.getFullYear() - 1);
+        twelveMonthStart.setDate(twelveMonthStart.getDate() + 1);
+        const startIndex = Math.max(
+            timelineView.minSelectionIndex,
+            calendarDayDiff(timelineView.bounds.start, twelveMonthStart)
         );
-        renderTimelineSelection(startIndex, Math.max(startIndex, endIndex), true);
+        renderTimelineSelection(Math.min(startIndex, endIndex), endIndex, true);
     }
 
     function shiftTimelineSelectionToToday(anchor) {
@@ -2877,6 +2892,56 @@
 
     function finishMobileTimelineTouchHover(event) {
         finishMobileTimelineHover(getTimelineTouchProxy(event, true));
+    }
+
+    function beginTimelineRangeDrag(event) {
+        if (!timelineView || window.innerWidth <= 640 || event.pointerType === 'touch') return;
+        if (event.button !== undefined && event.button !== 0) return;
+        timelineRangeDragState = {
+            anchorIndex: getTimelinePointerDayIndex(event),
+            startIndex: timelineView.selectionStart,
+            endIndex: timelineView.selectionEnd
+        };
+        event.currentTarget.classList.add('dragging');
+        if (event.currentTarget.setPointerCapture && event.pointerId !== undefined) {
+            event.currentTarget.setPointerCapture(event.pointerId);
+        }
+        hideTimelineTooltip();
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    function dragTimelineRange(event) {
+        if (!timelineRangeDragState || !timelineView) return;
+        const periodSpan = timelineRangeDragState.endIndex - timelineRangeDragState.startIndex;
+        const delta = getTimelinePointerDayIndex(event) - timelineRangeDragState.anchorIndex;
+        let startIndex = timelineRangeDragState.startIndex + delta;
+        let endIndex = startIndex + periodSpan;
+
+        if (startIndex < timelineView.minSelectionIndex) {
+            startIndex = timelineView.minSelectionIndex;
+            endIndex = startIndex + periodSpan;
+        }
+        if (endIndex > timelineView.maxSelectionIndex) {
+            endIndex = timelineView.maxSelectionIndex;
+            startIndex = endIndex - periodSpan;
+        }
+
+        renderTimelineSelection(startIndex, endIndex, false);
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    function finishTimelineRangeDrag(event) {
+        if (!timelineRangeDragState || !timelineView) return;
+        dragTimelineRange(event);
+        renderTimelineSelection(timelineView.selectionStart, timelineView.selectionEnd, true);
+        timelineRangeDragState = null;
+        event.currentTarget.classList.remove('dragging');
+        if (event.currentTarget.releasePointerCapture && event.pointerId !== undefined && event.currentTarget.hasPointerCapture && event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+        event.stopPropagation();
     }
 
     function beginTimelineRangeSelection(handleName, event) {
