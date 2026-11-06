@@ -1127,16 +1127,17 @@
                             <div class="cushion-title" data-i18n="citizenship5YearAccumulation">🌍 Citizenship 5-Yr Accumulation</div>
                             <div class="cushion-value" id="cushionCitizenTotal">0 Days</div>
                         </div>
-                        <div class="cushion-meta" data-i18n="cushionVs450">Cushion vs 450-day Y2-Y6 limit.</div>
-                        <div class="rule-note" data-i18n-html="citizenTotalRule"><strong>How calculated:</strong> 450 minus total counted absent days across the citizenship qualifying period used here, Years 2–6.</div>
+                        <div class="cushion-meta" data-i18n="cushionVs450">Cushion vs the 450-day limit in the five years before application.</div>
+                        <div class="rule-note" data-i18n-html="citizenTotalRule"><strong>How calculated:</strong> 450 minus counted absent days in the five years immediately before the projected citizenship application date.</div>
                     </div>
                     <div class="cushion-card">
                         <div>
                             <div class="cushion-title" data-i18n="citizenshipFinalYear">📅 Citizenship Final Year</div>
                             <div class="cushion-value" id="cushionCitizenY6">0 Days</div>
                         </div>
-                        <div class="cushion-meta" data-i18n="cushionVs90">Cushion vs 90-day Y6 limit.</div>
-                        <div class="rule-note" data-i18n-html="citizenY6Rule"><strong>How calculated:</strong> inactive until Year 6 starts; then 90 minus counted absent days in the final qualifying year.</div>
+                        <div class="cushion-meta" data-i18n="cushionVs90">Cushion vs the 90-day limit in the final 12 months before application.</div>
+                        <div class="rule-note" data-i18n-html="citizenY6Rule"><strong>How calculated:</strong> inactive until the final 12-month period starts; then 90 minus counted absent days before the projected citizenship application date.</div>
+                        <div class="note" id="citizenY6EstimateNote" style="display:none; margin-top:8px; color:#92400e;" data-i18n="citizenshipFinalYearEstimate">⚠️ Estimate only: the final-year dates and figures depend on the actual ILR grant date.</div>
                     </div>
                 </div>
                 <div id="citizenshipStatusText" style="font-weight: 700; text-align: center; padding: 10px; border-radius: 8px; font-size: 1rem;"></div>
@@ -1276,11 +1277,14 @@
             cushionVs180: "Cushion vs 180-day limit.",
             rollingCushionRule: "<strong>How calculated:</strong> 180 minus the highest absence count found in any rolling 12-calendar-month window during the ILR qualifying period.",
             citizenship5YearAccumulation: "🌍 Citizenship 5-Yr Accumulation Remaining Days",
-            cushionVs450: "Cushion vs 450-day Y2-Y6 limit.",
-            citizenTotalRule: "<strong>How calculated:</strong> 450 minus total counted absent days across the citizenship qualifying period used here, Years 2–6.",
+            cushionVs450: "Cushion vs the 450-day limit in the five years before application.",
+            citizenTotalRule: "<strong>How calculated:</strong> 450 minus counted absent days in the five years immediately before the projected citizenship application date.",
             citizenshipFinalYear: "📅 Citizenship Final Year Remaining Days",
-            cushionVs90: "Cushion vs 90-day Y6 limit.",
-            citizenY6Rule: "<strong>How calculated:</strong> inactive until Year 6 starts; then 90 minus counted absent days in the final qualifying year.",
+            cushionVs90: "Cushion vs the 90-day limit in the final 12 months before application.",
+            citizenY6Rule: "<strong>How calculated:</strong> inactive until the final 12-month period starts; then 90 minus counted absent days before the projected citizenship application date.",
+            citizenshipFinalYearEstimate: "⚠️ Estimate only: the final-year dates and figures depend on the actual ILR grant date.",
+            citizenshipFinalYearEstimateLead: "⚠️ Estimate only - final-year dates",
+            citizenshipFinalYearEstimateDetail: "and figures depend on the ILR grant date.",
             absenceVisualizerTitle: "6-Year Absence Timeline",
             absenceVisualizerNote: "The timeline runs from the month before your visa grant to the month after projected citizenship.",
             timelineZoom: "Zoom",
@@ -1362,8 +1366,8 @@
             citizenshipFinalYearShort: "Due to Citizenship Final Year",
             compliantSafe: "✅ 100% Compliant & Safe! Your profile satisfies all active settlement metrics. Your ultimate safety margin is {days} days.",
             ilrRollingBreach: "❌ ILR Rolling Breach: You exceeded 180 days away within a rolling 12-month window (Peak: {days} days).",
-            citizenshipCumulativeBreach: "❌ Citizenship Cumulative Breach: Combined totals across years 2–6 exceed 450 days ({days} days).",
-            citizenshipFinalYearBreach: "❌ Citizenship Final Year Breach: Year 6 absences exceed strict 90-day limit ({days} days).",
+            citizenshipCumulativeBreach: "❌ Citizenship Cumulative Breach: absences in the five years before the projected application date exceed 450 days ({days} days).",
+            citizenshipFinalYearBreach: "❌ Citizenship Final Year Breach: absences in the 12 months before the projected application date exceed the strict 90-day limit ({days} days).",
             importedTrip: "Imported Trip",
             couldNotReadFile: "Could not read the selected file.",
             configMustObject: "Config must be a JSON object.",
@@ -1371,6 +1375,8 @@
             importSuccess: "Tracker backup imported successfully.",
             importFailed: "Import failed",
             invalidBackup: "Invalid tracker backup format.",
+            invalidImportedTripDates: "Journey {index} must include valid departure and return dates in YYYY-MM-DD format.",
+            importedReturnBeforeDeparture: "Journey {index}: return date cannot occur before departure.",
             confirmReset: "Are you sure you want to delete all entries and reset the tracker?",
             returnBeforeDeparture: "Error: Return date cannot occur before departure.",
             notActiveYet: "Not Active Yet",
@@ -1420,11 +1426,14 @@
             cushionVs180: "距離 180 日上限尚餘的日數。",
             rollingCushionRule: "<strong>計算方法：</strong>180 減去永久居留合資格期間內，任何滾動 12 個月期間錄得的最高離境日數。",
             citizenship5YearAccumulation: "🌍 尚餘入籍 5 年累計離境日數",
-            cushionVs450: "距離第 2 至第 6 年 450 日上限尚餘的日數。",
-            citizenTotalRule: "<strong>計算方法：</strong>450 減去此工具採用的入籍合資格期間（第 2 至第 6 年）累計離境日數。",
+            cushionVs450: "距離預計入籍申請日前五年內 450 日上限尚餘的日數。",
+            citizenTotalRule: "<strong>計算方法：</strong>450 減去預計入籍申請日前五年內的累計離境日數。",
             citizenshipFinalYear: "📅 尚餘入籍最後一年限制日數",
-            cushionVs90: "距離第 6 年 90 日上限尚餘的日數。",
-            citizenY6Rule: "<strong>計算方法：</strong>第 6 年開始前不適用；開始後以 90 減去最後合資格年度內的離境日數。",
+            cushionVs90: "距離預計入籍申請日前十二個月內 90 日上限尚餘的日數。",
+            citizenY6Rule: "<strong>計算方法：</strong>最後十二個月開始前不適用；開始後以 90 減去預計入籍申請日前十二個月內的離境日數。",
+            citizenshipFinalYearEstimate: "⚠️ 此為估算：最後一年期間及日數須視乎實際永久居留批出日期。",
+            citizenshipFinalYearEstimateLead: "⚠️ 此為估算：最後一年期間及日數",
+            citizenshipFinalYearEstimateDetail: "須視乎實際永久居留批出日期。",
             absenceVisualizerTitle: "6 年離境時間線",
             absenceVisualizerNote: "時間線由簽證批出月份之前一個月開始，至預計可申請入籍月份之後一個月結束。",
             timelineZoom: "縮放",
@@ -1506,7 +1515,7 @@
             citizenshipFinalYearShort: "基於入籍最後一年",
             compliantSafe: "✅ 目前符合所有永久居留及入籍離境要求，尚可離境日數為 {days} 日。",
             ilrRollingBreach: "❌ 你曾於某個 12 個月期間離境超過 180 日（最高 {days} 日），未符合永久居留要求。",
-            citizenshipCumulativeBreach: "❌ 第 2 至第 6 年累計離境超過 450 日（目前 {days} 日），未符合入籍要求。",
+            citizenshipCumulativeBreach: "❌ 預計入籍申請日前五年內累計離境超過 450 日（目前 {days} 日），未符合入籍要求。",
             citizenshipFinalYearBreach: "❌ 入籍前最後一年離境超過 90 日限制（目前 {days} 日）。",
             importedTrip: "已匯入行程",
             couldNotReadFile: "無法讀取所選檔案。",
@@ -1515,6 +1524,8 @@
             importSuccess: "已成功匯入備份。",
             importFailed: "匯入失敗",
             invalidBackup: "備份檔格式不正確。",
+            invalidImportedTripDates: "行程 {index} 必須包含有效的離境及返回日期，格式為 YYYY-MM-DD。",
+            importedReturnBeforeDeparture: "行程 {index}：返回日期不能早於離境日期。",
             confirmReset: "確定要清除所有資料並重設？",
             returnBeforeDeparture: "返回日期不能早於離境日期。",
             notActiveYet: "尚未生效",
@@ -1979,6 +1990,19 @@
         return count;
     }
 
+    function getCitizenshipAbsenceWindows() {
+        if (!isValidDateString(cachedCitizenDateString)) return null;
+
+        const applicationDate = parseLocalDate(cachedCitizenDateString);
+        const periodEnd = addDays(applicationDate, -1);
+        const fiveYearStart = new Date(applicationDate);
+        fiveYearStart.setFullYear(fiveYearStart.getFullYear() - 5);
+        const finalYearStart = new Date(applicationDate);
+        finalYearStart.setFullYear(finalYearStart.getFullYear() - 1);
+
+        return { applicationDate, periodEnd, fiveYearStart, finalYearStart };
+    }
+
     function assignAbsencesToYears(years) {
         years.forEach(y => { y.absences = countAbsencesBetween(y.start, y.end); });
     }
@@ -2149,57 +2173,34 @@
     function getCushionBreakdownForDate(dateStr) {
         const hoverDate = parseLocalDate(dateStr);
         const isPreviousDisqualifiedPeriod = !!(renewalInfo && previousVisaYears.length >= 6 && hoverDate < renewalInfo.start);
-        const yearsForDate = isPreviousDisqualifiedPeriod ? previousVisaYears : visaYears;
         const rollingMapForDate = isPreviousDisqualifiedPeriod ? previousDailyRollingAbsencesMap : dailyRollingAbsencesMap;
 
         const rollingCount = rollingMapForDate[dateStr] || 0;
         const rollingCushion = Math.max(0, 180 - rollingCount);
 
-        // 1. Calculate Citizenship 5-Yr Accumulation (Years 2-6) up to the hovered date,
-        // using the timeline that date belongs to. Old dates stay tied to the disqualified
-        // timeline; renewed dates use the renewed Year 1 timeline.
+        // 1. Calculate citizenship absences using windows anchored to the projected
+        // application date (ILR grant date + 1 year when an actual grant date is supplied).
+        const citizenshipWindows = getCitizenshipAbsenceWindows();
         let absencesUpToHover = 0;
-        if (yearsForDate.length >= 6 && hoverDate >= yearsForDate[1].start) {
-            const startOfQualifyingPeriod = yearsForDate[1].start; // Start of Year 2 for that timeline
-            const endLimit = hoverDate > yearsForDate[5].end ? yearsForDate[5].end : hoverDate;
-            let checkDate = new Date(startOfQualifyingPeriod);
-
-            while (checkDate <= endLimit) {
-                const checkStr = formatDateLocal(checkDate);
-                if (globalAbsenceMap[checkStr] && globalAbsenceMap[checkStr].type === 'absent') {
-                    absencesUpToHover++;
-                }
-                checkDate.setDate(checkDate.getDate() + 1);
-            }
+        if (citizenshipWindows && hoverDate >= citizenshipWindows.fiveYearStart) {
+            const endLimit = hoverDate > citizenshipWindows.periodEnd ? citizenshipWindows.periodEnd : hoverDate;
+            absencesUpToHover = countAbsencesBetween(citizenshipWindows.fiveYearStart, endLimit);
         }
         const citizenTotalCushion = Math.max(0, 450 - absencesUpToHover);
 
-        // 2. Calculate Citizenship Final Year for the date's own timeline.
+        // 2. Calculate the final 12-month citizenship window from the same application date.
         let y6AbsencesUpToHover = 0;
         let isHoverDateInYear6 = false;
 
-        if (yearsForDate.length >= 6) {
-            const y6Start = yearsForDate[5].start;
-            const y6End = yearsForDate[5].end;
-
-            if (hoverDate >= y6Start) {
-                isHoverDateInYear6 = true;
-                let checkDate = new Date(y6Start);
-                const endLimit = (hoverDate > y6End) ? y6End : hoverDate;
-
-                while (checkDate <= endLimit) {
-                    const checkStr = formatDateLocal(checkDate);
-                    if (globalAbsenceMap[checkStr] && globalAbsenceMap[checkStr].type === 'absent') {
-                        y6AbsencesUpToHover++;
-                    }
-                    checkDate.setDate(checkDate.getDate() + 1);
-                }
-            }
+        if (citizenshipWindows && hoverDate >= citizenshipWindows.finalYearStart) {
+            isHoverDateInYear6 = true;
+            const endLimit = hoverDate > citizenshipWindows.periodEnd ? citizenshipWindows.periodEnd : hoverDate;
+            y6AbsencesUpToHover = countAbsencesBetween(citizenshipWindows.finalYearStart, endLimit);
         }
         const citizenY6Cushion = Math.max(0, 90 - y6AbsencesUpToHover);
 
         // 3. Determine Overall Safe Cushion Bottleneck
-        // Only include the 90-day Year 6 rule if the hovered date is actually in Year 6.
+        // Only include the 90-day rule once the final 12-month window has started.
         let overallCushion = Math.min(rollingCushion, citizenTotalCushion);
         if (isHoverDateInYear6) {
             overallCushion = Math.min(overallCushion, citizenY6Cushion);
@@ -2282,9 +2283,13 @@
                 milestoneCountdownText = msDays > 0 ? `<br><span style="color:#fef08a;">${t('daysFromToday', { days: msDays })}</span>` : `<br><span style="color:#4ade80;">${t('milestoneReached')}</span>`;
             }
 
-            // Build the Year 6 line conditionally. If it's not Year 6, this remains completely empty.
+            // Show the final-year line only after the application-anchored 12-month window starts.
+            const isCitizenshipEstimate = !document.getElementById('ilrGrantDate').value;
+            const y6EstimateLine = isCitizenshipEstimate
+                ? `<span style="color:#fbbf24; font-style:italic;">${t('citizenshipFinalYearEstimateLead')}<br>${t('citizenshipFinalYearEstimateDetail')}</span><br>`
+                : ``;
             const y6Line = cushion.isHoverDateInYear6
-                ? `📅 ${t('citizenshipFinalYearShort')}: <strong>${cushion.citizenY6Cushion} ${t('days')}</strong><br>`
+                ? `📅 ${t('citizenshipFinalYearShort')}: <strong>${cushion.citizenY6Cushion} ${t('days')}</strong><br>${y6EstimateLine}`
                 : ``;
 
             const disqualifiedLine = cushion.isPreviousDisqualifiedPeriod
@@ -2488,26 +2493,30 @@
             });
             if (mergedFailure) addTimelineInterval(mergedFailure);
 
-            const citizenshipTotal = countAbsencesBetween(years[1].start, years[5].end);
+        });
+
+        const citizenshipWindows = getCitizenshipAbsenceWindows();
+        if (citizenshipWindows) {
+            const citizenshipTotal = countAbsencesBetween(citizenshipWindows.fiveYearStart, citizenshipWindows.periodEnd);
             if (citizenshipTotal > 450) {
-                addTimelineInterval({
-                    start: new Date(years[1].start),
-                    end: new Date(years[5].end),
+                intervals.push({
+                    start: new Date(citizenshipWindows.fiveYearStart),
+                    end: new Date(citizenshipWindows.periodEnd),
                     type: 'citizenship-total',
                     count: citizenshipTotal
                 });
             }
 
-            const finalYearTotal = countAbsencesBetween(years[5].start, years[5].end);
+            const finalYearTotal = countAbsencesBetween(citizenshipWindows.finalYearStart, citizenshipWindows.periodEnd);
             if (finalYearTotal > 90) {
-                addTimelineInterval({
-                    start: new Date(years[5].start),
-                    end: new Date(years[5].end),
+                intervals.push({
+                    start: new Date(citizenshipWindows.finalYearStart),
+                    end: new Date(citizenshipWindows.periodEnd),
                     type: 'citizenship-final-year',
                     count: finalYearTotal
                 });
             }
-        });
+        }
 
         return intervals
             .map(interval => ({
@@ -3026,8 +3035,12 @@
         const disqualifiedLine = cushion.isPreviousDisqualifiedPeriod
             ? `<span style="color:#fca5a5; font-weight:700;">${escapeTimelineText(t('disqualifiedPeriod'))}</span><br>`
             : '';
+        const isCitizenshipEstimate = !document.getElementById('ilrGrantDate').value;
+        const y6EstimateLine = isCitizenshipEstimate
+            ? `<span style="color:#fbbf24;">${escapeTimelineText(t('citizenshipFinalYearEstimate'))}</span><br>`
+            : '';
         const y6Line = cushion.isHoverDateInYear6
-            ? `📅 ${escapeTimelineText(t('citizenshipFinalYearShort'))}: <strong>${cushion.citizenY6Cushion} ${escapeTimelineText(t('days'))}</strong><br>`
+            ? `📅 ${escapeTimelineText(t('citizenshipFinalYearShort'))}: <strong>${cushion.citizenY6Cushion} ${escapeTimelineText(t('days'))}</strong><br>${y6EstimateLine}`
             : '';
         const auditSection = day.presenceStatus === 'pre-visa'
             ? ''
@@ -3110,6 +3123,7 @@
         const cushionCitizenY6Value = selectedCushion.citizenY6Cushion;
         const isSelectedDateInYear6 = selectedCushion.isHoverDateInYear6;
         const overallCushionValue = selectedCushion.overallCushion;
+        const hasIlrGrantDate = !!document.getElementById('ilrGrantDate').value;
 
         document.getElementById('cushionRolling').innerText = `${cushionRollingValue} ${t('daysTitle')}`;
         document.getElementById('cushionCitizenTotal').innerText = `${cushionCitizenTotalValue} ${t('daysTitle')}`;
@@ -3119,6 +3133,7 @@
         } else {
             document.getElementById('cushionCitizenY6').innerText = t("notActiveYet");
         }
+        document.getElementById('citizenY6EstimateNote').style.display = hasIlrGrantDate ? 'none' : 'block';
 
         document.getElementById('cushionOverall').innerText = `${overallCushionValue} ${t('daysTitle')}`;
 
@@ -3242,20 +3257,30 @@
 
 
     function isValidDateString(value) {
-        return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(parseLocalDate(value).getTime());
+        if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+        const parsedDate = parseLocalDate(value);
+        return !Number.isNaN(parsedDate.getTime()) && formatDateLocal(parsedDate) === value;
     }
 
     function normalizeImportedTrips(importedTrips) {
-        if (!Array.isArray(importedTrips)) return [];
+        if (!Array.isArray(importedTrips)) throw new Error(t('invalidBackup'));
 
-        return importedTrips
-            .filter(trip => trip && isValidDateString(trip.out) && isValidDateString(trip.in))
-            .map((trip, index) => ({
+        return importedTrips.map((trip, index) => {
+            const journeyNumber = index + 1;
+            if (!trip || !isValidDateString(trip.out) || !isValidDateString(trip.in)) {
+                throw new Error(t('invalidImportedTripDates', { index: journeyNumber }));
+            }
+            if (parseLocalDate(trip.out) > parseLocalDate(trip.in)) {
+                throw new Error(t('importedReturnBeforeDeparture', { index: journeyNumber }));
+            }
+
+            return {
                 id: Number.isInteger(trip.id) ? trip.id : index + 1,
                 destination: String(trip.destination || t('importedTrip')).trim() || t('importedTrip'),
                 out: trip.out,
                 in: trip.in
-            }));
+            };
+        });
     }
 
     function applyTrackerConfig(config) {
@@ -3265,10 +3290,11 @@
         if (!isValidDateString(config.visaStart) || !isValidDateString(config.entryDate)) {
             throw new Error(t('configMustDates'));
         }
+        const normalizedTrips = normalizeImportedTrips(config.trips);
 
         document.getElementById('visaStart').value = config.visaStart;
         document.getElementById('entryDate').value = config.entryDate;
-        trips = normalizeImportedTrips(config.trips);
+        trips = normalizedTrips;
         nextId = Number.isInteger(config.nextId)
             ? config.nextId
             : (trips.reduce((max, trip) => Math.max(max, trip.id), 0) + 1);
@@ -3354,13 +3380,14 @@
                 if (!config || !Array.isArray(config.trips)) {
                     throw new Error(t("invalidBackup"));
                 }
+                const normalizedTrips = normalizeImportedTrips(config.trips);
 
                 document.getElementById('visaStart').value = config.visaStart || "2021-06-01";
                 document.getElementById('entryDate').value = config.entryDate || "2021-06-15";
                 if (isValidDateString(config.cushionDate)) {
                     document.getElementById('cushionDate').value = config.cushionDate;
                 }
-                trips = config.trips;
+                trips = normalizedTrips;
                 nextId = parseInt(config.nextId) || (trips.reduce((max, trip) => Math.max(max, trip.id || 0), 0) + 1);
 
                 localStorage.setItem('bno_visaStart', document.getElementById('visaStart').value);
