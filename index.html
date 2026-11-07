@@ -1020,6 +1020,17 @@
     <div class="grid">
         <div class="sidebar">
             <div class="card">
+                <h2 data-i18n="languageTitle">Language</h2>
+                <div class="form-group">
+                    <label for="languageSelect" data-i18n="languageLabel">Display Language</label>
+                    <select id="languageSelect" onchange="setLanguage(this.value)">
+                        <option value="en">English</option>
+                        <option value="zh-HK">中文</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
                 <h2 data-i18n="setupTitle">1. Setup Timeline Dates</h2>
                 <div class="form-group">
                     <label for="visaStart" data-i18n="visaGrantDate">Visa Grant Date</label>
@@ -1043,17 +1054,6 @@
                     <div class="note" data-i18n="britishCitizenSpouseNote">You only need to be married or in the civil partnership when you apply for citizenship, the relationship does not need to cover the whole 3-year qualifying period. Selecting Yes uses the 270-day limit and removes the 12-month wait after ILR.</div>
                 </div>
                 <div id="delayWarning" class="highlight-box" style="display:none;"></div>
-            </div>
-
-            <div class="card">
-                <h2 data-i18n="languageTitle">Language</h2>
-                <div class="form-group">
-                    <label for="languageSelect" data-i18n="languageLabel">Display Language</label>
-                    <select id="languageSelect" onchange="setLanguage(this.value)">
-                        <option value="en">English</option>
-                        <option value="zh-HK">中文</option>
-                    </select>
-                </div>
             </div>
 
             <div class="card">
