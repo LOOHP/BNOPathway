@@ -587,6 +587,12 @@
             color: var(--citizen-text);
             font-weight: 800;
         }
+        .cal-cell.citizen-bumped-day {
+            background: repeating-linear-gradient(135deg, #fff7ed, #fff7ed 5px, #fed7aa 5px, #fed7aa 10px) !important;
+            color: #9a3412 !important;
+            border: 2px dashed #f97316 !important;
+            font-weight: 700;
+        }
 
         .cal-cell.today {
             outline: 3px solid var(--today-border);
@@ -1028,6 +1034,14 @@
                     <input type="date" id="ilrGrantDate" onchange="saveTimelineSettings()">
                     <div class="note" data-i18n="ilrGrantDateNote">Only enter this once ILR has actually been granted. Citizenship will use this date if available.</div>
                 </div>
+                <div class="form-group">
+                    <label for="britishCitizenSpouse" data-i18n="britishCitizenSpouse">At the citizenship application date, will you be married to or in a civil partnership with a British citizen?</label>
+                    <select id="britishCitizenSpouse" onchange="saveTimelineSettings()">
+                        <option value="false" data-i18n="no">No</option>
+                        <option value="true" data-i18n="yes">Yes</option>
+                    </select>
+                    <div class="note" data-i18n="britishCitizenSpouseNote">You only need to be married or in the civil partnership when you apply for citizenship, the relationship does not need to cover the whole 3-year qualifying period. Selecting Yes uses the 270-day limit and removes the 12-month wait after ILR.</div>
+                </div>
                 <div id="delayWarning" class="highlight-box" style="display:none;"></div>
             </div>
 
@@ -1124,11 +1138,11 @@
                     </div>
                     <div class="cushion-card">
                         <div>
-                            <div class="cushion-title" data-i18n="citizenship5YearAccumulation">🌍 Citizenship 5-Yr Accumulation</div>
+                            <div class="cushion-title" id="citizenshipAccumulationTitle">🌍 Citizenship 5-Yr Accumulation</div>
                             <div class="cushion-value" id="cushionCitizenTotal">0 Days</div>
                         </div>
-                        <div class="cushion-meta" data-i18n="cushionVs450">Cushion vs the 450-day limit in the five years before application.</div>
-                        <div class="rule-note" data-i18n-html="citizenTotalRule"><strong>How calculated:</strong> 450 minus counted absent days in the five years immediately before the projected citizenship application date.</div>
+                        <div class="cushion-meta" id="citizenshipAccumulationMeta">Cushion vs the 450-day limit in the five years before application.</div>
+                        <div class="rule-note" id="citizenshipAccumulationRule"><strong>How calculated:</strong> 450 minus counted absent days in the five years immediately before the projected citizenship application date.</div>
                     </div>
                     <div class="cushion-card">
                         <div>
@@ -1138,6 +1152,15 @@
                         <div class="cushion-meta" data-i18n="cushionVs90">Cushion vs the 90-day limit in the final 12 months before application.</div>
                         <div class="rule-note" data-i18n-html="citizenY6Rule"><strong>How calculated:</strong> inactive until the final 12-month period starts; then 90 minus counted absent days before the projected citizenship application date.</div>
                         <div class="note" id="citizenY6EstimateNote" style="display:none; margin-top:8px; color:#92400e;" data-i18n="citizenshipFinalYearEstimate">⚠️ Estimate only: the final-year dates and figures depend on the actual ILR grant date.</div>
+                    </div>
+                    <div class="cushion-card">
+                        <div>
+                            <div class="cushion-title" data-i18n="qualifyingStartPresence">📍 Qualifying-Period Start Presence</div>
+                            <div class="cushion-value" id="qualifyingStartPresenceValue">--</div>
+                        </div>
+                        <div class="cushion-meta" id="qualifyingStartPresenceMeta">--</div>
+                        <div class="rule-note" data-i18n-html="qualifyingStartPresenceRule"><strong>Rule:</strong> you must normally have been physically present in the UK at the start of the qualifying period.</div>
+                        <div class="note" id="qualifyingStartPresenceEstimateNote" style="display:none; margin-top:8px; color:#92400e;" data-i18n="qualifyingStartPresenceEstimate">⚠️ Estimate only: the required presence date depends on the actual ILR grant date.</div>
                     </div>
                 </div>
                 <div id="citizenshipStatusText" style="font-weight: 700; text-align: center; padding: 10px; border-radius: 8px; font-size: 1rem;"></div>
@@ -1248,6 +1271,10 @@
             physicalEntryDate: "Physical Date Entered UK",
             ilrGrantDate: "ILR Granted Date (optional)",
             ilrGrantDateNote: "Only enter this once ILR has actually been granted. Citizenship will use this date if available.",
+            britishCitizenSpouse: "At the citizenship application date, will you be married to or in a civil partnership with a British citizen?",
+            britishCitizenSpouseNote: "You only need to be married or in the civil partnership when you apply for citizenship; the relationship does not need to cover the whole 3-year qualifying period. Selecting Yes uses the 270-day limit and removes the 12-month wait after ILR.",
+            yes: "Yes",
+            no: "No",
             languageTitle: "Language 語言",
             languageLabel: "Display Language 顯示語言",
             travelTitle: "2. Log Additional Travel",
@@ -1268,8 +1295,9 @@
             historyTitle: "Tracked History Matrix",
             earliestIlrApplicationDate: "🎉 Earliest ILR Application Date",
             earliestCitizenshipApplicationDate: "🇬🇧 Earliest Citizenship Application Date",
-            ilrRuleUsed: "<strong>Rule used:</strong> if you entered the UK within 180 days of visa approval, Year 1 starts from the visa grant date and the pre-entry days count as absences; otherwise it is calculated from your physical UK entry date. The earliest application window is then 28 days before the 5-year point.",
+            ilrRuleUsed: "<strong>Rule used:</strong> if you entered the UK within 180 days of visa approval, Year 1 starts from the visa grant date and the pre-entry days count as absences, otherwise it is calculated from your physical UK entry date. The earliest application window is then 28 days before the 5-year point.",
             citizenshipRuleUsed: "<strong>Rule used:</strong> approximated as 1 year after the earliest ILR application date. Actual eligibility depends on the real ILR grant date and citizenship rules at the time.",
+            citizenshipRuleSpouse: "<strong>Rule used:</strong> no 12-month wait after ILR for a spouse or civil partner of a British citizen, the 3-year residence rules still apply. The actual date depends on the ILR grant date.",
             totalSafeCushion: "🛡️ Total Safe Cushion Remaining Days",
             limitingBottleneck: "Your limiting critical bottleneck factor.",
             overallCushionRule: "<strong>How calculated:</strong> the lowest active remaining allowance across the applicable ILR and citizenship absence rules.",
@@ -1285,6 +1313,20 @@
             citizenshipFinalYearEstimate: "⚠️ Estimate only: the final-year dates and figures depend on the actual ILR grant date.",
             citizenshipFinalYearEstimateLead: "⚠️ Estimate only - final-year dates",
             citizenshipFinalYearEstimateDetail: "and figures depend on the ILR grant date.",
+            citizenshipAccumulationDynamic: "🌍 Citizenship {years}-Yr Accumulation Remaining Days",
+            cushionVsCitizenLimit: "Cushion vs the {limit}-day limit in the {years} years before application.",
+            citizenTotalRuleDynamic: "<strong>How calculated:</strong> {limit} minus counted absent days in the {years} years immediately before the projected citizenship application date.",
+            qualifyingStartPresence: "📍 Qualifying-Period Start Presence",
+            qualifyingStartPresenceRule: "<strong>Rule:</strong> you must normally have been physically present in the UK at the start of the qualifying period. Home Office formula: application date + 1 day - 3 or 5 years.",
+            qualifyingStartPresenceEstimate: "⚠️ Estimate only: the required presence date depends on the actual ILR grant date.",
+            presenceMet: "MET",
+            presenceNotMet: "NOT MET",
+            presenceDate: "Required UK presence: {date}, for citizenship application on {applicationDate}.",
+            presenceMetAfterBumpOne: "MET - BUMPED BY 1 DAY",
+            presenceMetAfterBumpMany: "MET - BUMPED BY {days} DAYS",
+            presenceBumpReasonOne: "Application moved forward by 1 day to {applicationDate} because the original qualifying-period start date, {originalDate}, was a whole day outside the UK. New required UK presence date: {presenceDate}.",
+            presenceBumpReasonMany: "Application moved forward by {days} days to {applicationDate} because the corresponding qualifying-period start dates, beginning with {originalDate}, were whole days outside the UK. New required UK presence date: {presenceDate}.",
+            citizenshipDateAdjustedForPresence: "Adjusted forward from {date} to meet the qualifying-start presence rule.",
             absenceVisualizerTitle: "6-Year Absence Timeline",
             absenceVisualizerNote: "The timeline runs from the month before your visa grant to the month after projected citizenship.",
             timelineZoom: "Zoom",
@@ -1309,7 +1351,7 @@
             timelineRangeSummary: "{start} to {end} · {days} days selected · {absent} absent days · peak rolling absence {peak} days",
             timelineCompliantDay: "No compliance limit is breached on this date.",
             timelineRollingWindowBreach: "Rolling 12-month window ending {end}: {count} absent days ({excess} above the 180-day limit).",
-            timelineCitizenPeriodBreach: "Citizenship five-year period {start} to {end}: {count} absent days ({excess} above the 450-day limit).",
+            timelineCitizenPeriodBreach: "Citizenship {years}-year period {start} to {end}: {count} absent days ({excess} above the {limit}-day limit).",
             timelineFinalYearPeriodBreach: "Citizenship final-year period {start} to {end}: {count} absent days ({excess} above the 90-day limit).",
             timelineRestartedComplianceExplanation: "This non-compliant period belongs to the previous qualifying calculation and ends when recalculation restarts on {date}; compliant days after that are assessed under the renewed period.",
             timelineVisaGrantMarker: "Visa grant",
@@ -1325,7 +1367,7 @@
             today: "Today",
             todayUpper: "TODAY",
             ilrApplShort: "ILR APPL",
-            passportShort: "PASSPORT",
+            passportShort: "CIT APPL",
             departure: "Departure",
             arrival: "Arrival",
             countedWholeDays: "Counted Whole Days",
@@ -1362,11 +1404,15 @@
             milestoneReached: "✓ Milestone reached",
             rollingAbsences: "Rolling absences: {days} days",
             citizenship5YrAccumShort: "Due to Citizenship 5-Yr Accum.",
+            citizenshipAccumShortDynamic: "Due to Citizenship {years}-Yr Accum.",
             ilrRolling12MonthShort: "Due to ILR Rolling 12-Month",
             citizenshipFinalYearShort: "Due to Citizenship Final Year",
             compliantSafe: "✅ 100% Compliant & Safe! Your profile satisfies all active settlement metrics. Your ultimate safety margin is {days} days.",
             ilrRollingBreach: "❌ ILR Rolling Breach: You exceeded 180 days away within a rolling 12-month window (Peak: {days} days).",
-            citizenshipCumulativeBreach: "❌ Citizenship Cumulative Breach: absences in the five years before the projected application date exceed 450 days ({days} days).",
+            citizenshipCumulativeBreach: "❌ Citizenship Cumulative Breach: absences in the {years} years before the projected application date exceed {limit} days ({days} days).",
+            citizenshipDateBumped: "Not eligible on this date: the corresponding qualifying-period start date ({date}) was a whole day outside the UK.",
+            citizenshipDateBumpedLead: "Not eligible on this date:",
+            citizenshipDateBumpedDetail: "qualifying start {date} was outside the UK.",
             citizenshipFinalYearBreach: "❌ Citizenship Final Year Breach: absences in the 12 months before the projected application date exceed the strict 90-day limit ({days} days).",
             importedTrip: "Imported Trip",
             couldNotReadFile: "Could not read the selected file.",
@@ -1397,6 +1443,10 @@
             physicalEntryDate: "實際到達英國日期",
             ilrGrantDate: "永久居留批出日期（可選）",
             ilrGrantDateNote: "只在永久居留已正式批出後填寫。如有填寫，入籍日期會以此日期計算。",
+            britishCitizenSpouse: "在申請入籍當日，你會否已與英國公民結婚或締結民事伴侶關係？",
+            britishCitizenSpouseNote: "只須在申請入籍當日已婚或已締結民事伴侶關係；毋須在整個 3 年合資格期間維持該關係。選擇「是」會採用 270 日上限，並取消取得永久居留後等待 12 個月的要求。",
+            yes: "是",
+            no: "否",
             languageTitle: "語言 Language",
             languageLabel: "顯示語言 Display Language",
             travelTitle: "2. 記錄離境行程",
@@ -1419,6 +1469,7 @@
             earliestCitizenshipApplicationDate: "🇬🇧 最早可申請入籍日期",
             ilrRuleUsed: "<strong>採用規則：</strong>如你在簽證批出後 180 日內到達英國，第 1 年會由簽證批出日期起計，而到達英國前的日子會計作離境日；否則會由實際到達英國日期起計。最早申請日期為 5 年期滿前 28 日。",
             citizenshipRuleUsed: "<strong>採用規則：</strong>暫以最早可申請永久居留日期後 1 年估算。實際資格須視乎永久居留正式批出日期及當時入籍規定。",
+            citizenshipRuleSpouse: "<strong>採用規則：</strong>英國公民的配偶或民事伴侶取得永久居留後毋須等待 12 個月，但仍須符合 3 年居留規定。實際日期視乎永久居留批出日期。",
             totalSafeCushion: "🛡️ 尚可離境日數",
             limitingBottleneck: "以目前最嚴格的一項離境限制計算。",
             overallCushionRule: "<strong>計算方法：</strong>在適用的永久居留及入籍離境規則中，取最低的剩餘可用日數。",
@@ -1434,6 +1485,20 @@
             citizenshipFinalYearEstimate: "⚠️ 此為估算：最後一年期間及日數須視乎實際永久居留批出日期。",
             citizenshipFinalYearEstimateLead: "⚠️ 此為估算：最後一年期間及日數",
             citizenshipFinalYearEstimateDetail: "須視乎實際永久居留批出日期。",
+            citizenshipAccumulationDynamic: "🌍 尚餘入籍 {years} 年累計離境日數",
+            cushionVsCitizenLimit: "距離申請日前 {years} 年內 {limit} 日上限尚餘的日數。",
+            citizenTotalRuleDynamic: "<strong>計算方法：</strong>{limit} 減去預計入籍申請日前 {years} 年內的累計離境日數。",
+            qualifyingStartPresence: "📍 合資格期間起始日在英國",
+            qualifyingStartPresenceRule: "<strong>規則：</strong>一般須在合資格期間首日身處英國。內政部公式：申請日期加 1 日，再減 3 年或 5 年。",
+            qualifyingStartPresenceEstimate: "⚠️ 此為估算：規定身處英國的日期須視乎實際永久居留批出日期。",
+            presenceMet: "符合",
+            presenceNotMet: "不符合",
+            presenceDate: "規定身處英國日期：{date}；入籍申請日期：{applicationDate}。",
+            presenceMetAfterBumpOne: "符合 - 已順延 1 日",
+            presenceMetAfterBumpMany: "符合 - 已順延 {days} 日",
+            presenceBumpReasonOne: "申請日期已順延 1 日至 {applicationDate}，因原來的合資格期間起始日 {originalDate} 為整日不在英國。新的規定身處英國日期：{presenceDate}。",
+            presenceBumpReasonMany: "申請日期已順延 {days} 日至 {applicationDate}，因由 {originalDate} 起相對的合資格期間起始日均為整日不在英國。新的規定身處英國日期：{presenceDate}。",
+            citizenshipDateAdjustedForPresence: "已由 {date} 往後調整，以符合起始日身處英國規定。",
             absenceVisualizerTitle: "6 年離境時間線",
             absenceVisualizerNote: "時間線由簽證批出月份之前一個月開始，至預計可申請入籍月份之後一個月結束。",
             timelineZoom: "縮放",
@@ -1458,7 +1523,7 @@
             timelineRangeSummary: "{start} 至 {end} · 已選 {days} 日 · 離境 {absent} 日 · 12 個月滾動離境最高 {peak} 日",
             timelineCompliantDay: "此日期沒有超出任何離境限制。",
             timelineRollingWindowBreach: "截至 {end} 的 12 個月期間共有 {count} 日離境（超出 180 日上限 {excess} 日）。",
-            timelineCitizenPeriodBreach: "入籍五年期間 {start} 至 {end} 共有 {count} 日離境（超出 450 日上限 {excess} 日）。",
+            timelineCitizenPeriodBreach: "入籍 {years} 年期間 {start} 至 {end} 共有 {count} 日離境（超出 {limit} 日上限 {excess} 日）。",
             timelineFinalYearPeriodBreach: "入籍最後一年期間 {start} 至 {end} 共有 {count} 日離境（超出 90 日上限 {excess} 日）。",
             timelineRestartedComplianceExplanation: "此不合規期間屬於上一個合資格計算期，並於 {date} 重新開始計算時結束；其後的合規日子會按新的計算期評估。",
             timelineVisaGrantMarker: "簽證批出",
@@ -1474,7 +1539,7 @@
             today: "今日",
             todayUpper: "今日",
             ilrApplShort: "永居申請",
-            passportShort: "護照",
+            passportShort: "入籍申請",
             departure: "離境",
             arrival: "入境",
             countedWholeDays: "計算離境日數",
@@ -1511,11 +1576,15 @@
             milestoneReached: "✓ 已達申請日期",
             rollingAbsences: "12 個月滾動離境：{days} 日",
             citizenship5YrAccumShort: "基於入籍 5 年累計",
+            citizenshipAccumShortDynamic: "基於入籍 {years} 年累計",
             ilrRolling12MonthShort: "基於永久居留 12 個月限制",
             citizenshipFinalYearShort: "基於入籍最後一年",
             compliantSafe: "✅ 目前符合所有永久居留及入籍離境要求，尚可離境日數為 {days} 日。",
             ilrRollingBreach: "❌ 你曾於某個 12 個月期間離境超過 180 日（最高 {days} 日），未符合永久居留要求。",
-            citizenshipCumulativeBreach: "❌ 預計入籍申請日前五年內累計離境超過 450 日（目前 {days} 日），未符合入籍要求。",
+            citizenshipCumulativeBreach: "❌ 預計入籍申請日前 {years} 年內累計離境超過 {limit} 日（目前 {days} 日），未符合入籍要求。",
+            citizenshipDateBumped: "此日不符合資格：相對的合資格期間起始日（{date}）為整日不在英國。",
+            citizenshipDateBumpedLead: "此日不符合資格：",
+            citizenshipDateBumpedDetail: "合資格起始日 {date} 為整日不在英國。",
             citizenshipFinalYearBreach: "❌ 入籍前最後一年離境超過 90 日限制（目前 {days} 日）。",
             importedTrip: "已匯入行程",
             couldNotReadFile: "無法讀取所選檔案。",
@@ -1652,6 +1721,7 @@
     let previousDailyRollingAbsencesMap = {};
     let cachedILRDateString = "";
     let cachedCitizenDateString = "";
+    let cachedCitizenUnadjustedDateString = "";
     let activeQualifyingStartDate = null;
     let displayedTimelineYears = [];
     let previousVisaYears = [];
@@ -1689,6 +1759,7 @@
             const ilrGrantInput = document.getElementById('ilrGrantDate');
             if (ilrGrantInput) ilrGrantInput.value = localStorage.getItem('bno_ilrGrantDate');
         }
+        document.getElementById('britishCitizenSpouse').value = localStorage.getItem('bno_britishCitizenSpouse') === 'true' ? 'true' : 'false';
 
         const storedTrips = localStorage.getItem('bno_trips_list');
         const storedNextId = localStorage.getItem('bno_nextId');
@@ -1826,6 +1897,7 @@
             if (ilrGrantInput.value) localStorage.setItem('bno_ilrGrantDate', ilrGrantInput.value);
             else localStorage.removeItem('bno_ilrGrantDate');
         }
+        localStorage.setItem('bno_britishCitizenSpouse', document.getElementById('britishCitizenSpouse').value);
         updateTimeline();
     }
 
@@ -1841,6 +1913,7 @@
             document.getElementById('entryDate').value = "2021-06-15";
             const ilrGrantInput = document.getElementById('ilrGrantDate');
             if (ilrGrantInput) ilrGrantInput.value = "";
+            document.getElementById('britishCitizenSpouse').value = 'false';
             document.getElementById('cushionDate').value = formatDateLocal(TODAY_ANCHOR);
             trips = [];
             nextId = 1;
@@ -1855,6 +1928,30 @@
         const diffDays = calendarDayDiff(dOut, dIn);
         if (diffDays <= 0) return 0;
         return diffDays - 1;
+    }
+
+    function getCitizenshipRouteConfig() {
+        const spouseRoute = document.getElementById('britishCitizenSpouse').value === 'true';
+        return {
+            spouseRoute,
+            qualifyingYears: spouseRoute ? 3 : 5,
+            totalAbsenceLimit: spouseRoute ? 270 : 450,
+            waitYearsAfterIlr: spouseRoute ? 0 : 1
+        };
+    }
+
+    function getQualifyingStartDate(applicationDate, qualifyingYears) {
+        const startDate = addDays(applicationDate, 1);
+        startDate.setFullYear(startDate.getFullYear() - qualifyingYears);
+        return startDate;
+    }
+
+    function adjustCitizenshipDateForStartPresence(applicationDate, qualifyingYears) {
+        const adjustedDate = new Date(applicationDate);
+        while (!isInUkDate(getQualifyingStartDate(adjustedDate, qualifyingYears))) {
+            adjustedDate.setDate(adjustedDate.getDate() + 1);
+        }
+        return adjustedDate;
     }
 
     function updateTimeline() {
@@ -1935,9 +2032,14 @@
         const ilrGrantDateStr = ilrGrantInput ? ilrGrantInput.value : "";
         const hasIlrGrantDate = !!ilrGrantDateStr;
         const citizenshipBaseDate = hasIlrGrantDate ? parseLocalDate(ilrGrantDateStr) : earliestILRDate;
+        const citizenshipRoute = getCitizenshipRouteConfig();
+        document.querySelector('[data-i18n-html="citizenshipRuleUsed"]').innerHTML = t(citizenshipRoute.spouseRoute ? 'citizenshipRuleSpouse' : 'citizenshipRuleUsed');
 
         let targetCitizenDate = new Date(citizenshipBaseDate);
-        targetCitizenDate.setFullYear(targetCitizenDate.getFullYear() + 1);
+        targetCitizenDate.setFullYear(targetCitizenDate.getFullYear() + citizenshipRoute.waitYearsAfterIlr);
+        const unadjustedCitizenDate = new Date(targetCitizenDate);
+        targetCitizenDate = adjustCitizenshipDateForStartPresence(targetCitizenDate, citizenshipRoute.qualifyingYears);
+        cachedCitizenUnadjustedDateString = formatDateLocal(unadjustedCitizenDate);
 
         cachedCitizenDateString = formatDateLocal(targetCitizenDate);
         document.getElementById('citizenTargetDate').innerText = formatDateForDisplay(targetCitizenDate, options);
@@ -1954,6 +2056,9 @@
             document.getElementById('citizenDateMeta').innerText = hasIlrGrantDate
                 ? t('usingIlrGrantDate', { date: formatDateForDisplay(citizenshipBaseDate, options) })
                 : t('subjectToIlrGrantDate');
+        }
+        if (targetCitizenDate > unadjustedCitizenDate) {
+            document.getElementById('citizenDateMeta').innerText += ` ${t('citizenshipDateAdjustedForPresence', { date: formatDateForDisplay(unadjustedCitizenDate, options) })}`;
         }
     }
 
@@ -1994,13 +2099,12 @@
         if (!isValidDateString(cachedCitizenDateString)) return null;
 
         const applicationDate = parseLocalDate(cachedCitizenDateString);
-        const periodEnd = addDays(applicationDate, -1);
-        const fiveYearStart = new Date(applicationDate);
-        fiveYearStart.setFullYear(fiveYearStart.getFullYear() - 5);
-        const finalYearStart = new Date(applicationDate);
-        finalYearStart.setFullYear(finalYearStart.getFullYear() - 1);
+        const route = getCitizenshipRouteConfig();
+        const periodEnd = new Date(applicationDate);
+        const fiveYearStart = getQualifyingStartDate(applicationDate, route.qualifyingYears);
+        const finalYearStart = getQualifyingStartDate(applicationDate, 1);
 
-        return { applicationDate, periodEnd, fiveYearStart, finalYearStart };
+        return { applicationDate, periodEnd, fiveYearStart, finalYearStart, qualifyingYears: route.qualifyingYears, totalAbsenceLimit: route.totalAbsenceLimit };
     }
 
     function assignAbsencesToYears(years) {
@@ -2186,7 +2290,8 @@
             const endLimit = hoverDate > citizenshipWindows.periodEnd ? citizenshipWindows.periodEnd : hoverDate;
             absencesUpToHover = countAbsencesBetween(citizenshipWindows.fiveYearStart, endLimit);
         }
-        const citizenTotalCushion = Math.max(0, 450 - absencesUpToHover);
+        const citizenTotalLimit = citizenshipWindows ? citizenshipWindows.totalAbsenceLimit : 450;
+        const citizenTotalCushion = Math.max(0, citizenTotalLimit - absencesUpToHover);
 
         // 2. Calculate the final 12-month citizenship window from the same application date.
         let y6AbsencesUpToHover = 0;
@@ -2211,6 +2316,7 @@
             rollingCushion,
             citizenTotalAbsences: absencesUpToHover,
             citizenTotalCushion,
+            citizenTotalLimit,
             citizenY6Absences: y6AbsencesUpToHover,
             citizenY6Cushion,
             overallCushion,
@@ -2253,6 +2359,12 @@
 
             const isILRDay = (dateStr === cachedILRDateString);
             const isCitizenDay = (dateStr === cachedCitizenDateString);
+            const isCitizenBumpedDay = isValidDateString(cachedCitizenUnadjustedDateString)
+                && dateStr >= cachedCitizenUnadjustedDateString
+                && dateStr < cachedCitizenDateString;
+            const bumpedStartDate = isCitizenBumpedDay
+                ? getQualifyingStartDate(thisDate, getCitizenshipRouteConfig().qualifyingYears)
+                : null;
 
             if (isILRDay) {
                 extraClass += 'ilr-milestone-day ';
@@ -2260,6 +2372,8 @@
             } else if (isCitizenDay) {
                 extraClass += 'citizen-milestone-day ';
                 statusLabelText = t('citizenshipMilestone');
+            } else if (isCitizenBumpedDay) {
+                extraClass += 'citizen-bumped-day ';
             }
 
             if (globalAbsenceMap[dateStr]) {
@@ -2295,16 +2409,20 @@
             const disqualifiedLine = cushion.isPreviousDisqualifiedPeriod
                 ? `<span style="color:#fca5a5; font-weight:700;">${t('disqualifiedPeriod')}</span><br>`
                 : ``;
+            const bumpedDateLine = bumpedStartDate
+                ? `<span style="color:#fdba74; font-style:italic;">${t('citizenshipDateBumpedLead')}<br>${t('citizenshipDateBumpedDetail', { date: formatDateLocal(bumpedStartDate) })}</span><br>`
+                : ``;
 
             const tooltipHTML = `
                 <div class="tooltip" style="white-space: nowrap;">
                     <strong>${dateStr} ${isToday ? `(${t("today")})` : ""}</strong><br>
                     ${disqualifiedLine}
+                    ${bumpedDateLine}
                     <span style="color:#94a3b8;">${statusLabelText}</span>${milestoneCountdownText}
                     <hr style="border-color:#334155; margin:6px 0;">
                     🛡️ ${t('totalSafeCushion').replace('🛡️ ', '')}: <span style="color:${cushion.overallCushion > 30 ? '#22c55e' : '#f97316'}; font-weight:bold;">${cushion.overallCushion} ${t('days')}</span><br>
                     ⏳ ${t('ilrRolling12MonthShort')}: <strong>${cushion.rollingCushion} ${t('days')}</strong><br>
-                    🌍 ${t('citizenship5YrAccumShort')}: <strong>${cushion.citizenTotalCushion} ${t('days')}</strong><br>
+                    🌍 ${t('citizenshipAccumShortDynamic', { years: getCitizenshipRouteConfig().qualifyingYears })}: <strong>${cushion.citizenTotalCushion} ${t('days')}</strong><br>
                     ${y6Line}
                     <span style="color:#94a3b8;">${t('rollingAbsences', { days: rollingCount })}</span>
                 </div>
@@ -2498,12 +2616,14 @@
         const citizenshipWindows = getCitizenshipAbsenceWindows();
         if (citizenshipWindows) {
             const citizenshipTotal = countAbsencesBetween(citizenshipWindows.fiveYearStart, citizenshipWindows.periodEnd);
-            if (citizenshipTotal > 450) {
+            if (citizenshipTotal > citizenshipWindows.totalAbsenceLimit) {
                 intervals.push({
                     start: new Date(citizenshipWindows.fiveYearStart),
                     end: new Date(citizenshipWindows.periodEnd),
                     type: 'citizenship-total',
-                    count: citizenshipTotal
+                    count: citizenshipTotal,
+                    limit: citizenshipWindows.totalAbsenceLimit,
+                    years: citizenshipWindows.qualifyingYears
                 });
             }
 
@@ -2540,7 +2660,9 @@
                 start: formatDateLocal(interval.start),
                 end: formatDateLocal(interval.end),
                 count: interval.count,
-                excess: interval.count - 450
+                excess: interval.count - interval.limit,
+                limit: interval.limit,
+                years: interval.years
             });
         } else {
             explanation = t('timelineFinalYearPeriodBreach', {
@@ -3048,7 +3170,7 @@
                 <hr class="timeline-detail-divider">
                 🛡️ ${escapeTimelineText(t('totalSafeCushion').replace('🛡️ ', ''))}: <span style="color:${cushion.overallCushion > 30 ? '#22c55e' : '#f97316'}; font-weight:bold;">${cushion.overallCushion} ${escapeTimelineText(t('days'))}</span><br>
                 ⏳ ${escapeTimelineText(t('ilrRolling12MonthShort'))}: <strong>${cushion.rollingCushion} ${escapeTimelineText(t('days'))}</strong><br>
-                🌍 ${escapeTimelineText(t('citizenship5YrAccumShort'))}: <strong>${cushion.citizenTotalCushion} ${escapeTimelineText(t('days'))}</strong><br>
+                🌍 ${escapeTimelineText(t('citizenshipAccumShortDynamic', { years: getCitizenshipRouteConfig().qualifyingYears }))}: <strong>${cushion.citizenTotalCushion} ${escapeTimelineText(t('days'))}</strong><br>
                 ${y6Line}
                 <span style="color:#94a3b8;">${escapeTimelineText(t('rollingAbsences', { days: cushion.rollingCount }))}</span>
             `;
@@ -3124,9 +3246,37 @@
         const isSelectedDateInYear6 = selectedCushion.isHoverDateInYear6;
         const overallCushionValue = selectedCushion.overallCushion;
         const hasIlrGrantDate = !!document.getElementById('ilrGrantDate').value;
+        const citizenshipRoute = getCitizenshipRouteConfig();
+        const citizenshipWindows = getCitizenshipAbsenceWindows();
 
         document.getElementById('cushionRolling').innerText = `${cushionRollingValue} ${t('daysTitle')}`;
         document.getElementById('cushionCitizenTotal').innerText = `${cushionCitizenTotalValue} ${t('daysTitle')}`;
+        document.getElementById('citizenshipAccumulationTitle').innerText = t('citizenshipAccumulationDynamic', { years: citizenshipRoute.qualifyingYears });
+        document.getElementById('citizenshipAccumulationMeta').innerText = t('cushionVsCitizenLimit', { limit: citizenshipRoute.totalAbsenceLimit, years: citizenshipRoute.qualifyingYears });
+        document.getElementById('citizenshipAccumulationRule').innerHTML = t('citizenTotalRuleDynamic', { limit: citizenshipRoute.totalAbsenceLimit, years: citizenshipRoute.qualifyingYears });
+        const presenceDate = citizenshipWindows ? citizenshipWindows.fiveYearStart : null;
+        const presenceMet = presenceDate ? isInUkDate(presenceDate) : false;
+        const unadjustedApplicationDate = isValidDateString(cachedCitizenUnadjustedDateString) ? parseLocalDate(cachedCitizenUnadjustedDateString) : null;
+        const adjustedApplicationDate = isValidDateString(cachedCitizenDateString) ? parseLocalDate(cachedCitizenDateString) : null;
+        const presenceBumpDays = unadjustedApplicationDate && adjustedApplicationDate
+            ? Math.max(0, calendarDayDiff(unadjustedApplicationDate, adjustedApplicationDate))
+            : 0;
+        if (presenceBumpDays > 0 && presenceDate) {
+            const originalPresenceDate = getQualifyingStartDate(unadjustedApplicationDate, citizenshipRoute.qualifyingYears);
+            const bumpValues = {
+                days: presenceBumpDays,
+                originalDate: formatDateLocal(originalPresenceDate),
+                presenceDate: formatDateLocal(presenceDate),
+                applicationDate: formatDateLocal(adjustedApplicationDate)
+            };
+            document.getElementById('qualifyingStartPresenceValue').innerText = t(presenceBumpDays === 1 ? 'presenceMetAfterBumpOne' : 'presenceMetAfterBumpMany', bumpValues);
+            document.getElementById('qualifyingStartPresenceMeta').innerText = t(presenceBumpDays === 1 ? 'presenceBumpReasonOne' : 'presenceBumpReasonMany', bumpValues);
+        } else {
+            document.getElementById('qualifyingStartPresenceValue').innerText = presenceMet ? t('presenceMet') : t('presenceNotMet');
+            document.getElementById('qualifyingStartPresenceMeta').innerText = presenceDate && adjustedApplicationDate
+                ? t('presenceDate', { date: formatDateLocal(presenceDate), applicationDate: formatDateLocal(adjustedApplicationDate) })
+                : '--';
+        }
 
         if (isSelectedDateInYear6) {
             document.getElementById('cushionCitizenY6').innerText = `${cushionCitizenY6Value} ${t('daysTitle')}`;
@@ -3134,6 +3284,7 @@
             document.getElementById('cushionCitizenY6').innerText = t("notActiveYet");
         }
         document.getElementById('citizenY6EstimateNote').style.display = hasIlrGrantDate ? 'none' : 'block';
+        document.getElementById('qualifyingStartPresenceEstimateNote').style.display = hasIlrGrantDate ? 'none' : 'block';
 
         document.getElementById('cushionOverall').innerText = `${overallCushionValue} ${t('daysTitle')}`;
 
@@ -3153,8 +3304,8 @@
         if (selectedCushion.rollingCount > 180) {
             statusMsgText.innerHTML = t('ilrRollingBreach', { days: selectedCushion.rollingCount });
             statusMsgText.style.background = "#fef2f2"; statusMsgText.style.color = "var(--danger)";
-        } else if (selectedCushion.citizenTotalAbsences > 450) {
-            statusMsgText.innerHTML = t('citizenshipCumulativeBreach', { days: selectedCushion.citizenTotalAbsences });
+        } else if (selectedCushion.citizenTotalAbsences > selectedCushion.citizenTotalLimit) {
+            statusMsgText.innerHTML = t('citizenshipCumulativeBreach', { days: selectedCushion.citizenTotalAbsences, limit: selectedCushion.citizenTotalLimit, years: citizenshipRoute.qualifyingYears });
             statusMsgText.style.background = "#fef2f2"; statusMsgText.style.color = "var(--danger)";
         } else if (isSelectedDateInYear6 && selectedCushion.citizenY6Absences > 90) {
             statusMsgText.innerHTML = t('citizenshipFinalYearBreach', { days: selectedCushion.citizenY6Absences });
@@ -3243,6 +3394,7 @@
             visaStart: document.getElementById('visaStart').value,
             entryDate: document.getElementById('entryDate').value,
             ilrGrantDate: (document.getElementById("ilrGrantDate") ? document.getElementById("ilrGrantDate").value : ""),
+            britishCitizenSpouse: document.getElementById('britishCitizenSpouse').value === 'true',
             trips: trips.map(trip => ({
                 id: trip.id,
                 destination: trip.destination,
@@ -3294,6 +3446,8 @@
 
         document.getElementById('visaStart').value = config.visaStart;
         document.getElementById('entryDate').value = config.entryDate;
+        document.getElementById('ilrGrantDate').value = isValidDateString(config.ilrGrantDate) ? config.ilrGrantDate : '';
+        document.getElementById('britishCitizenSpouse').value = config.britishCitizenSpouse === true ? 'true' : 'false';
         trips = normalizedTrips;
         nextId = Number.isInteger(config.nextId)
             ? config.nextId
@@ -3308,6 +3462,9 @@
 
         localStorage.setItem('bno_visaStart', config.visaStart);
         localStorage.setItem('bno_entryDate', config.entryDate);
+        if (isValidDateString(config.ilrGrantDate)) localStorage.setItem('bno_ilrGrantDate', config.ilrGrantDate);
+        else localStorage.removeItem('bno_ilrGrantDate');
+        localStorage.setItem('bno_britishCitizenSpouse', config.britishCitizenSpouse === true);
         localStorage.setItem('bno_cushion_date', getSelectedCushionDateString());
         saveTripsToStorage();
         saveCalendarViewState();
@@ -3346,6 +3503,8 @@
             londonDate: getLondonTodayString(),
             visaStart: document.getElementById('visaStart').value,
             entryDate: document.getElementById('entryDate').value,
+            ilrGrantDate: document.getElementById('ilrGrantDate').value,
+            britishCitizenSpouse: document.getElementById('britishCitizenSpouse').value === 'true',
             shownCalendarMonth: parseInt(document.getElementById('calMonth').value),
             shownCalendarYear: parseInt(document.getElementById('calYear').value),
             cushionDate: getSelectedCushionDateString(),
@@ -3384,6 +3543,8 @@
 
                 document.getElementById('visaStart').value = config.visaStart || "2021-06-01";
                 document.getElementById('entryDate').value = config.entryDate || "2021-06-15";
+                document.getElementById('ilrGrantDate').value = isValidDateString(config.ilrGrantDate) ? config.ilrGrantDate : '';
+                document.getElementById('britishCitizenSpouse').value = config.britishCitizenSpouse === true ? 'true' : 'false';
                 if (isValidDateString(config.cushionDate)) {
                     document.getElementById('cushionDate').value = config.cushionDate;
                 }
@@ -3392,6 +3553,7 @@
 
                 localStorage.setItem('bno_visaStart', document.getElementById('visaStart').value);
                 localStorage.setItem('bno_entryDate', document.getElementById('entryDate').value);
+                localStorage.setItem('bno_britishCitizenSpouse', document.getElementById('britishCitizenSpouse').value);
                 localStorage.setItem('bno_cushion_date', getSelectedCushionDateString());
                 saveTripsToStorage();
 
