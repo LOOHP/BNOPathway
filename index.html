@@ -1155,12 +1155,13 @@
                     </div>
                     <div class="cushion-card">
                         <div>
-                            <div class="cushion-title" data-i18n="qualifyingStartPresence">📍 Qualifying-Period Start Presence</div>
+                            <div class="cushion-title" data-i18n="qualifyingStartPresence">📍 Citizenship Residence Eligibility</div>
                             <div class="cushion-value" id="qualifyingStartPresenceValue">--</div>
                         </div>
                         <div class="cushion-meta" id="qualifyingStartPresenceMeta">--</div>
-                        <div class="rule-note" data-i18n-html="qualifyingStartPresenceRule"><strong>Rule:</strong> you must normally have been physically present in the UK at the start of the qualifying period.</div>
-                        <div class="note" id="qualifyingStartPresenceEstimateNote" style="display:none; margin-top:8px; color:#92400e;" data-i18n="qualifyingStartPresenceEstimate">⚠️ Estimate only: the required presence date depends on the actual ILR grant date.</div>
+                        <div class="rule-note" data-i18n-html="qualifyingStartPresenceRule"><strong>Rules:</strong> the date must satisfy qualifying-start UK presence, the cumulative absence limit and the 90-day final-year limit.</div>
+                        <div class="note" style="margin-top:8px;" data-i18n="travelHistoryAssumption">Presence is inferred from the tracker: dates after UK entry with no recorded absence are treated as days in the UK. Ensure all travel has been entered.</div>
+                        <div class="note" id="qualifyingStartPresenceEstimateNote" style="display:none; margin-top:8px; color:#92400e;" data-i18n="qualifyingStartPresenceEstimate">⚠️ Estimate only: the residence windows depend on the actual ILR grant date. Assumes all travel has been recorded.</div>
                     </div>
                 </div>
                 <div id="citizenshipStatusText" style="font-weight: 700; text-align: center; padding: 10px; border-radius: 8px; font-size: 1rem;"></div>
@@ -1316,17 +1317,19 @@
             citizenshipAccumulationDynamic: "🌍 Citizenship {years}-Yr Accumulation Remaining Days",
             cushionVsCitizenLimit: "Cushion vs the {limit}-day limit in the {years} years before application.",
             citizenTotalRuleDynamic: "<strong>How calculated:</strong> {limit} minus counted absent days in the {years} years immediately before the projected citizenship application date.",
-            qualifyingStartPresence: "📍 Qualifying-Period Start Presence",
-            qualifyingStartPresenceRule: "<strong>Rule:</strong> you must normally have been physically present in the UK at the start of the qualifying period. Home Office formula: application date + 1 day - 3 or 5 years.",
-            qualifyingStartPresenceEstimate: "⚠️ Estimate only: the required presence date depends on the actual ILR grant date.",
+            qualifyingStartPresence: "📍 Citizenship Residence Eligibility",
+            qualifyingStartPresenceRule: "<strong>Rules:</strong> the date must satisfy qualifying-start UK presence, the cumulative absence limit and the 90-day final-year limit. Start-date formula: application date + 1 day - 3 or 5 years.",
+            qualifyingStartPresenceEstimate: "⚠️ Estimate only: the residence windows depend on the actual ILR grant date. Assumes all travel has been recorded.",
+            travelHistoryAssumption: "Presence is inferred from the tracker: dates after UK entry with no recorded absence are treated as days in the UK. Ensure all travel has been entered.",
             presenceMet: "MET",
             presenceNotMet: "NOT MET",
             presenceDate: "Required UK presence: {date}, for citizenship application on {applicationDate}.",
+            eligibilitySummary: "Application {applicationDate}; required UK presence {presenceDate}; {years}-year absences {cumulative}/{limit}; final-year absences {final}/90.",
             presenceMetAfterBumpOne: "MET - BUMPED BY 1 DAY",
             presenceMetAfterBumpMany: "MET - BUMPED BY {days} DAYS",
-            presenceBumpReasonOne: "Application moved forward by 1 day to {applicationDate} because the original qualifying-period start date, {originalDate}, was a whole day outside the UK. New required UK presence date: {presenceDate}.",
-            presenceBumpReasonMany: "Application moved forward by {days} days to {applicationDate} because the corresponding qualifying-period start dates, beginning with {originalDate}, were whole days outside the UK. New required UK presence date: {presenceDate}.",
-            citizenshipDateAdjustedForPresence: "Adjusted forward from {date} to meet the qualifying-start presence rule.",
+            presenceBumpReasonOne: "Application moved forward by 1 day to {applicationDate}. Original candidate: start presence {startStatus}; {years}-year absences {cumulative}/{limit}; final-year absences {final}/90. The new date satisfies all three checks.",
+            presenceBumpReasonMany: "Application moved forward by {days} days to {applicationDate}. Original candidate: start presence {startStatus}; {years}-year absences {cumulative}/{limit}; final-year absences {final}/90. The new date satisfies all three checks.",
+            citizenshipDateAdjustedForPresence: "Adjusted forward from {date} until the start-presence and absence-limit checks are all met.",
             absenceVisualizerTitle: "6-Year Absence Timeline",
             absenceVisualizerNote: "The timeline runs from the month before your visa grant to the month after projected citizenship.",
             timelineZoom: "Zoom",
@@ -1413,6 +1416,9 @@
             citizenshipDateBumped: "Not eligible on this date: the corresponding qualifying-period start date ({date}) was a whole day outside the UK.",
             citizenshipDateBumpedLead: "Not eligible on this date:",
             citizenshipDateBumpedDetail: "qualifying start {date} was outside the UK.",
+            candidateStartFailure: "Start {date}: outside the UK.",
+            candidateCumulativeFailure: "{years}-year absences: {count}/{limit}.",
+            candidateFinalYearFailure: "Final-year absences: {count}/90.",
             citizenshipFinalYearBreach: "❌ Citizenship Final Year Breach: absences in the 12 months before the projected application date exceed the strict 90-day limit ({days} days).",
             importedTrip: "Imported Trip",
             couldNotReadFile: "Could not read the selected file.",
@@ -1488,17 +1494,19 @@
             citizenshipAccumulationDynamic: "🌍 尚餘入籍 {years} 年累計離境日數",
             cushionVsCitizenLimit: "距離申請日前 {years} 年內 {limit} 日上限尚餘的日數。",
             citizenTotalRuleDynamic: "<strong>計算方法：</strong>{limit} 減去預計入籍申請日前 {years} 年內的累計離境日數。",
-            qualifyingStartPresence: "📍 合資格期間首日身處英國",
-            qualifyingStartPresenceRule: "<strong>規則：</strong>一般須在合資格期間首日身處英國。內政部公式：申請日期加 1 日，再減 3 年或 5 年。",
-            qualifyingStartPresenceEstimate: "⚠️ 此為估算：規定身處英國的日期須視乎實際永久居留批出日期。",
+            qualifyingStartPresence: "📍 入籍居留資格",
+            qualifyingStartPresenceRule: "<strong>規則：</strong>日期須同時符合起始日身處英國、累計離境上限及最後一年 90 日上限。起始日公式：申請日期加 1 日，再減 3 年或 5 年。",
+            qualifyingStartPresenceEstimate: "⚠️ 此為估算：居留計算期間須視乎實際永久居留批出日期。假設所有外遊記錄均已輸入。",
+            travelHistoryAssumption: "身處英國狀態由追蹤器推算：入境英國後如沒有離境記錄，會視為身處英國。請確保已輸入所有外遊。",
             presenceMet: "符合",
             presenceNotMet: "不符合",
             presenceDate: "規定身處英國日期：{date}；入籍申請日期：{applicationDate}。",
+            eligibilitySummary: "申請日期 {applicationDate}；規定身處英國日期 {presenceDate}；{years} 年離境 {cumulative}/{limit}；最後一年離境 {final}/90。",
             presenceMetAfterBumpOne: "符合 - 已順延 1 日",
             presenceMetAfterBumpMany: "符合 - 已順延 {days} 日",
-            presenceBumpReasonOne: "申請日期已順延 1 日至 {applicationDate}，因原來的合資格期間起始日 {originalDate} 為整日不在英國。新的規定身處英國日期：{presenceDate}。",
-            presenceBumpReasonMany: "申請日期已順延 {days} 日至 {applicationDate}，因由 {originalDate} 起相對的合資格期間起始日均為整日不在英國。新的規定身處英國日期：{presenceDate}。",
-            citizenshipDateAdjustedForPresence: "已由 {date} 往後調整，以符合起始日身處英國規定。",
+            presenceBumpReasonOne: "申請日期已順延 1 日至 {applicationDate}。原候選日期：起始日在英國 {startStatus}；{years} 年離境 {cumulative}/{limit}；最後一年離境 {final}/90。新日期符合全部三項檢查。",
+            presenceBumpReasonMany: "申請日期已順延 {days} 日至 {applicationDate}。原候選日期：起始日在英國 {startStatus}；{years} 年離境 {cumulative}/{limit}；最後一年離境 {final}/90。新日期符合全部三項檢查。",
+            citizenshipDateAdjustedForPresence: "已由 {date} 往後調整，直至起始日在英國及離境上限全部符合。",
             absenceVisualizerTitle: "6 年離境時間線",
             absenceVisualizerNote: "時間線由簽證批出月份之前一個月開始，至預計可申請入籍月份之後一個月結束。",
             timelineZoom: "縮放",
@@ -1585,6 +1593,9 @@
             citizenshipDateBumped: "此日不符合資格：相對的合資格期間起始日（{date}）為整日不在英國。",
             citizenshipDateBumpedLead: "此日不符合資格：",
             citizenshipDateBumpedDetail: "合資格起始日 {date} 為整日不在英國。",
+            candidateStartFailure: "起始日 {date}：不在英國。",
+            candidateCumulativeFailure: "{years} 年離境：{count}/{limit}。",
+            candidateFinalYearFailure: "最後一年離境：{count}/90。",
             citizenshipFinalYearBreach: "❌ 入籍前最後一年離境超過 90 日限制（目前 {days} 日）。",
             importedTrip: "已匯入行程",
             couldNotReadFile: "無法讀取所選檔案。",
@@ -1946,9 +1957,28 @@
         return startDate;
     }
 
-    function adjustCitizenshipDateForStartPresence(applicationDate, qualifyingYears) {
+    function evaluateCitizenshipCandidate(applicationDate, route = getCitizenshipRouteConfig()) {
+        const qualifyingStart = getQualifyingStartDate(applicationDate, route.qualifyingYears);
+        const finalYearStart = getQualifyingStartDate(applicationDate, 1);
+        const cumulativeAbsences = countAbsencesBetween(qualifyingStart, applicationDate);
+        const finalYearAbsences = countAbsencesBetween(finalYearStart, applicationDate);
+        const startPresenceMet = isInUkDate(qualifyingStart);
+
+        return {
+            qualifyingStart,
+            finalYearStart,
+            cumulativeAbsences,
+            finalYearAbsences,
+            startPresenceMet,
+            cumulativeLimitMet: cumulativeAbsences <= route.totalAbsenceLimit,
+            finalYearLimitMet: finalYearAbsences <= 90,
+            eligible: startPresenceMet && cumulativeAbsences <= route.totalAbsenceLimit && finalYearAbsences <= 90
+        };
+    }
+
+    function adjustCitizenshipDateForResidenceEligibility(applicationDate, route) {
         const adjustedDate = new Date(applicationDate);
-        while (!isInUkDate(getQualifyingStartDate(adjustedDate, qualifyingYears))) {
+        while (!evaluateCitizenshipCandidate(adjustedDate, route).eligible) {
             adjustedDate.setDate(adjustedDate.getDate() + 1);
         }
         return adjustedDate;
@@ -2038,7 +2068,7 @@
         let targetCitizenDate = new Date(citizenshipBaseDate);
         targetCitizenDate.setFullYear(targetCitizenDate.getFullYear() + citizenshipRoute.waitYearsAfterIlr);
         const unadjustedCitizenDate = new Date(targetCitizenDate);
-        targetCitizenDate = adjustCitizenshipDateForStartPresence(targetCitizenDate, citizenshipRoute.qualifyingYears);
+        targetCitizenDate = adjustCitizenshipDateForResidenceEligibility(targetCitizenDate, citizenshipRoute);
         cachedCitizenUnadjustedDateString = formatDateLocal(unadjustedCitizenDate);
 
         cachedCitizenDateString = formatDateLocal(targetCitizenDate);
@@ -2362,8 +2392,8 @@
             const isCitizenBumpedDay = isValidDateString(cachedCitizenUnadjustedDateString)
                 && dateStr >= cachedCitizenUnadjustedDateString
                 && dateStr < cachedCitizenDateString;
-            const bumpedStartDate = isCitizenBumpedDay
-                ? getQualifyingStartDate(thisDate, getCitizenshipRouteConfig().qualifyingYears)
+            const bumpedCompliance = isCitizenBumpedDay
+                ? evaluateCitizenshipCandidate(thisDate, getCitizenshipRouteConfig())
                 : null;
 
             if (isILRDay) {
@@ -2409,8 +2439,22 @@
             const disqualifiedLine = cushion.isPreviousDisqualifiedPeriod
                 ? `<span style="color:#fca5a5; font-weight:700;">${t('disqualifiedPeriod')}</span><br>`
                 : ``;
-            const bumpedDateLine = bumpedStartDate
-                ? `<span style="color:#fdba74; font-style:italic;">${t('citizenshipDateBumpedLead')}<br>${t('citizenshipDateBumpedDetail', { date: formatDateLocal(bumpedStartDate) })}</span><br>`
+            const bumpedReasonLines = [];
+            if (bumpedCompliance && !bumpedCompliance.startPresenceMet) {
+                bumpedReasonLines.push(t('candidateStartFailure', { date: formatDateLocal(bumpedCompliance.qualifyingStart) }));
+            }
+            if (bumpedCompliance && !bumpedCompliance.cumulativeLimitMet) {
+                bumpedReasonLines.push(t('candidateCumulativeFailure', {
+                    years: getCitizenshipRouteConfig().qualifyingYears,
+                    count: bumpedCompliance.cumulativeAbsences,
+                    limit: getCitizenshipRouteConfig().totalAbsenceLimit
+                }));
+            }
+            if (bumpedCompliance && !bumpedCompliance.finalYearLimitMet) {
+                bumpedReasonLines.push(t('candidateFinalYearFailure', { count: bumpedCompliance.finalYearAbsences }));
+            }
+            const bumpedDateLine = bumpedReasonLines.length
+                ? `<span style="color:#fdba74; font-style:italic;">${t('citizenshipDateBumpedLead')}<br>${bumpedReasonLines.join('<br>')}</span><br>`
                 : ``;
 
             const tooltipHTML = `
@@ -3263,18 +3307,32 @@
             : 0;
         if (presenceBumpDays > 0 && presenceDate) {
             const originalPresenceDate = getQualifyingStartDate(unadjustedApplicationDate, citizenshipRoute.qualifyingYears);
+            const originalCompliance = evaluateCitizenshipCandidate(unadjustedApplicationDate, citizenshipRoute);
             const bumpValues = {
                 days: presenceBumpDays,
                 originalDate: formatDateLocal(originalPresenceDate),
                 presenceDate: formatDateLocal(presenceDate),
-                applicationDate: formatDateLocal(adjustedApplicationDate)
+                applicationDate: formatDateLocal(adjustedApplicationDate),
+                startStatus: t(originalCompliance.startPresenceMet ? 'presenceMet' : 'presenceNotMet'),
+                years: citizenshipRoute.qualifyingYears,
+                cumulative: originalCompliance.cumulativeAbsences,
+                limit: citizenshipRoute.totalAbsenceLimit,
+                final: originalCompliance.finalYearAbsences
             };
             document.getElementById('qualifyingStartPresenceValue').innerText = t(presenceBumpDays === 1 ? 'presenceMetAfterBumpOne' : 'presenceMetAfterBumpMany', bumpValues);
             document.getElementById('qualifyingStartPresenceMeta').innerText = t(presenceBumpDays === 1 ? 'presenceBumpReasonOne' : 'presenceBumpReasonMany', bumpValues);
         } else {
+            const finalCompliance = adjustedApplicationDate ? evaluateCitizenshipCandidate(adjustedApplicationDate, citizenshipRoute) : null;
             document.getElementById('qualifyingStartPresenceValue').innerText = presenceMet ? t('presenceMet') : t('presenceNotMet');
-            document.getElementById('qualifyingStartPresenceMeta').innerText = presenceDate && adjustedApplicationDate
-                ? t('presenceDate', { date: formatDateLocal(presenceDate), applicationDate: formatDateLocal(adjustedApplicationDate) })
+            document.getElementById('qualifyingStartPresenceMeta').innerText = presenceDate && adjustedApplicationDate && finalCompliance
+                ? t('eligibilitySummary', {
+                    applicationDate: formatDateLocal(adjustedApplicationDate),
+                    presenceDate: formatDateLocal(presenceDate),
+                    years: citizenshipRoute.qualifyingYears,
+                    cumulative: finalCompliance.cumulativeAbsences,
+                    limit: citizenshipRoute.totalAbsenceLimit,
+                    final: finalCompliance.finalYearAbsences
+                })
                 : '--';
         }
 
